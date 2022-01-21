@@ -11,6 +11,7 @@ node_modules/
 bin/
 *.pkl
 *.exe
+*.pdf
 
 ###
 ### Latex gitignore:
