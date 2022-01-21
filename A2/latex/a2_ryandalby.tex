@@ -1,0 +1,295 @@
+\documentclass[12pt]{article}
+
+% Packages 
+\usepackage{amsmath}
+\usepackage{datetime}
+
+% \graphicspath{{./images/}}
+
+\newdate{date}{24}{01}{2022}
+\title{
+    Assignment A2
+
+    \large{
+        ME EN 6240 Advanced Mechatronics
+    }  
+}
+    
+\author{
+        Ryan Dalby
+}
+\date{\displaydate{date}}
+
+
+\begin{document}
+\maketitle
+
+\paragraph{Exercise 2.}
+
+\begin{itemize}
+    \item 
+    A pointer is generally a memory address (whose value itself is defined/constrained by the architecture of the memory).
+
+    \item 
+    A non-pointer is just some memory that isn't an address specifically, usually holds data and its size is defined by its data type.
+\end{itemize}
+
+\paragraph{Exercise 3.}
+
+\begin{itemize}
+    \item 
+    Lines can often be blurred between interpreted and compiled code nowadays (think JIT compiling)
+
+    \item 
+    Generally interpreted code is read line-by-line while compiled code is compiled directly to machine code
+\end{itemize}
+
+\paragraph{Exercise 4.}
+
+\begin{itemize}
+    \item [a.]
+    0x1E = 0b 0001 1110 = 0d30
+
+    MSB: 0
+
+    \item [b.]
+    0x32 = 0b 0011 0010 = 0d50
+
+    MSB: 0
+
+    \item [c.]
+    0xFE = 0b 1111 1110 = 0d254
+
+    MSB: 1
+
+    \item [d.]
+    0xC4 = 0b 1100 0010 = 0d196
+
+    MSB: 1
+\end{itemize}
+
+\paragraph{Exercise 6.}
+\begin{itemize}
+    \item 
+    $(2^{16}) * 8 = 524288$
+\end{itemize}
+
+\paragraph{Exercise 7.}
+
+\begin{itemize}
+    \item [a.]
+    107
+
+    \item [b.]
+    5
+
+    \item [c.]
+    61
+
+    \item [d.]
+    63
+\end{itemize}
+
+\paragraph{Exercise 8.}
+
+\begin{itemize}
+    \item 
+    unsigned char: $0 \text{ to } 2^{8} - 1$
+
+    \item
+    short int: $-2^{15} \text{ to } 2^{15} - 1$
+
+    \item 
+    double: Depends on architecture and float standard used
+
+\end{itemize}
+
+\paragraph{Exercise 10.}
+
+\begin{itemize}
+    \item 
+    Difference between unsigned and signed integers are how the bits within them are interpreted (usually one bit (usually MSB) reserved for some notion of positive/negative)
+\end{itemize}
+
+\paragraph{Exercise 11.}
+
+\begin{itemize}
+    \item [a.]
+    For integer math chars will generally take up less space in memory and are usually computationally faster.
+    Chars are more susceptible to overflow because they cannot take on nearly as many values as an integer.
+
+    \item [b.]
+    For floating point math floats generally take up less memory.
+    On the other hand, doubles can give more range and precision.
+
+    \item [c.]
+    For integer math chars are generally better than floats because they can exactly represent integers and usually take up less memory than floats.
+    Chars may have overflow though and be unable to represent numbers as big as floats can so that is when floats may be better for performing integer math (although an int would be even better).
+\end{itemize}
+
+\paragraph{Exercise 12.}
+
+\begin{itemize}
+    \item [a.]
+    0d13 = 0b 0000 1101 = 0x0D
+
+    \item [b.]
+    0d27 = 0b 0001 1011 = 0x1B
+
+    \item [c.]
+    0d-10 = 0b 1111 0110 = 0xF6
+
+    \item [d.]
+    0d-17 = 0b1110 1111 = 0xEF
+\end{itemize}
+
+\paragraph{Exercise 13.}
+
+\begin{itemize}
+    \item 
+    The smallest positive integer that cannot be exactly represented by a four byte IEEE 754 is $2^{24} + 1$ or $16777217$ 
+    
+    This is because an IEEE float is represented as 32 bits layed out as 0b$sef$ where $s$ is a sign bit, $e = e_7...e_0$, and $f = f_{23}...f_1$ where the value of the number represented is value $= (-1)^s (b) (2^c)$.
+
+    Also $c = e-127$ and $b = 1 + \sum_{i=1}^{23}{f_i 2^{i-24}} = 1 + A$
+
+    So looking at value $= 2^{24} + 1$ we take $s = 0$, $c = 24$ so then we have 
+    \[
+        2^{24} + 1 = 1 (1+A) 2^{24} = 2^{24} + A 2^{24}
+    \]
+    Thus to exactly represent the value we need $A 2^{24} = 1$ but this is not possible because we can't get $A = 2^{-24}$ exactly, i.e. we could take A = $A^{-23}$ which means $A 2^{24} = 2$ but we can't get exactly $A = 2^{-24}$.
+
+\end{itemize}
+
+\paragraph{Exercise 14.}
+
+\begin{itemize}
+    \item [a.]
+    unsigned int: 20 = 0x 00 00 00 14
+
+    \item [b.]
+    signed int: -20 = 0x FF FF FF EC
+
+    \item [c.]
+    IEEE 754 float: 1.5 = 0x 3F C0 00 00
+
+    \item [d.]
+    IEEE 754 float: 0 = 0x 00 00 00 00
+
+\end{itemize}
+
+\paragraph{Exercise 15.}
+
+\begin{itemize}
+    \item 
+    See program titled ``ieee754printer.c'' 
+\end{itemize}
+
+\paragraph{Exercise 16.}
+
+\begin{itemize}
+    \item 
+    Assuming pointers occupy 8 bytes then the data type that is most similar to the actual data of a pointer would be an unsigned long integer (although this is usually left up to implementation).
+\end{itemize}
+
+\paragraph{Exercise 17.}
+
+Assuming have $2^8$ bytes of RAM so each address is given by a single byte,
+
+\verb|unsigned int i, j, *kp, *np|
+
+and assuming linker places 
+
+i in addresses 0xB0...0xB3
+
+j in 0xB4...0xB7
+
+kp in 0xB8
+
+np in 0xB9
+
+\begin{itemize}
+    \item[a.]
+    Initially conditions of all memory contents are unknown
+
+    \item[b.]
+    \verb|kp = &i;| sets 0xB8 to 0xB0
+
+    \item[c.]
+    \verb|j = *kp;| sets 0xB4...0xB7 to whatever is held in 0xB0...0xB3 (unknown) 
+
+    \item[d.]
+    \verb|i = 0xAE;| sets 0xB0 to 0xAE and sets 0xB1...0xB3 to 0x00
+
+    \item[e.]
+    \verb|np = kp;| sets 0xB9 to 0xB0
+
+    \item[f.]
+    \verb|*np = 0x12;| sets 0xB0 to 0x12
+
+    \item[g.]
+    \verb|j = *kp;| sets 0xB4 to 0x12 then 0xB5...0xB7 to 0x00
+\end{itemize}
+
+\paragraph{Exercise 18.}
+
+\begin{itemize}
+    \item [1.]
+    Preprocessing: Cleaning up the source code, .c to .c, preprocessor directives \# are executed/filled.
+
+    \item [2.]
+    Compiling: From C code to assembly code (.c to .s).
+    Gives a set of commands that can be executed by the processor.
+
+    \item [3.]
+    Assembling: From assembly code to object code (.s to .o).
+    Machine level, binary code, relocatable, specific to the processor (at this point the data and instructions are in terms of \textbf{relative} addresses, essential indicating "jumping" to another addresses (typically addresses of other libraries or other .o files that aren't combined with current code yet)).
+    \item [4.]
+    Linking: From object code (one or more files) to \textbf{ONE} executable (Linker decides where things actually go in memory).
+
+\end{itemize}
+
+\paragraph{Exercise 19.}
+
+\begin{itemize}
+    \item 
+    Main returns an integer.
+    Typically this return value is 0 if the program completed correctly and is something else otherwise.
+\end{itemize}
+
+\paragraph{Exercise 21.}
+
+\begin{itemize}
+    \item [a.]
+    140
+
+    \item [b.]
+    4
+
+    \item [c.]
+    24
+\end{itemize}
+
+\paragraph{Exercise 22.}
+
+\begin{itemize}
+    \item [a.]
+    0.0
+
+    \item [b.]
+    0.6666...
+
+    \item [c.]
+    0.0
+
+    \item [d.]
+    3
+
+    \item [e.]
+    3
+
+    \item [f.]
+    3.0
+\end{itemize}
+
+\end{document}
