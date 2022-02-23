@@ -1,0 +1,116 @@
+\documentclass[12pt]{article}
+
+% Packages 
+\usepackage{amsmath}
+\usepackage{datetime}
+\usepackage{graphicx}
+\usepackage{listings}
+
+\graphicspath{{./images/}}
+
+\newdate{date}{28}{02}{2022}
+\title{
+    Assignment 6 
+
+    \large{
+        ME EN 6240 Advanced Mechatronics
+    }  
+}
+    
+\author{
+        Ryan Dalby
+}
+\date{\displaydate{date}}
+
+
+\begin{document}
+\maketitle
+
+\section*{Exercise 1}
+Pros for interrupts vs polling:
+\begin{itemize}
+    \item 
+    Polling uses extra CPU cycles to constantly check for something specifically.
+    \item 
+    Interrupts can be triggered more independently of the CPU than polling.
+\end{itemize}
+
+\begin{flushleft}
+Cons for interrupts vs polling:
+\end{flushleft}
+\begin{itemize}
+    \item 
+    Polling gives better control for when exactly code is executed when compared to interrupt (more deterministic from the perspective of the CPU). 
+    This can be important if there are situations when the CPU shouldn't be interrupted, which it can be easier to control this when using polling.
+\end{itemize}
+
+\section*{Exercise 4}
+\begin{itemize}
+    \item[a.] 
+    The CPU register state is saved and then the new priority level 4 ISR will be executed and once completed the original CPU register state will be put back in its pre-interrupt state.
+
+    \item[b.] 
+    If current priority level 2 ISR will be saved and then new priority level 4 ISR will be executed then the original level 2 ISR will be restored and continue execution.
+
+    \item[c.] 
+    The current priority level 4 ISR will finish execution before proceeding to the new priority level 4 ISR because the priority level is the same (the sub priority doesn't determine what the CPU is going to do).
+
+    \item[d.] 
+    The current priority level 6 ISR will finish execution before proceeding to the new priority level 4 ISR will be executed after it completes.
+\end{itemize}
+
+\section*{Exercise 5}
+\begin{itemize}
+    \item[a.] 
+    The CPU must save the current CPU register values in RAM before executing the ISR and the last thing done upon completing the ISR is to restore the pre-interrupt CPU register state from RAM.
+
+    \item[b.] 
+    With the shadow register set the CPU switches what registers it uses to the shadow register set rather than saving before executing the ISR then upon completing the ISR it switches back to the original CPU register set.
+
+\end{itemize}
+
+\section*{Exercise 8}
+\begin{itemize}
+    \item[a.] 
+    \begin{verbatim}
+    IEC0 |= 0b1 << 8; // Enable timer2 interrupt
+    IFS0 &= 0xFFFFFEFF; // Set flag status to 0
+    IPC2 |= 0b101 << 2; // Set priority to 5
+    IPC2 |= 0b10; // Set subpriority to 2
+    \end{verbatim}
+
+    \item[b.] 
+    \begin{verbatim}
+    IEC1 |= 0b1 << 15; // Enable real time clock and calender 
+    IFS1 &= 0xFFFF7FFF; // Set flag status to 0
+    IPC8 |= 0b110 << 26; // Set priority to 6
+    IPC8 |= 0b01 << 24; // Set subpriority to 1
+    \end{verbatim}
+
+    \item[c.] 
+    \begin{verbatim}
+    IEC2 |= 0b1 << 4; // Enable UART4 receiver input
+    IFS2 &= 0xFFFFFFEF; // Set flag status to 0
+    IPC12 |= 0b111 << 10; // Set priority to 7
+    IPC12 |= 0b11 << 8; // Set subpriority to 3
+        
+    \end{verbatim}
+
+    \item[d.] 
+    \begin{verbatim}
+    IEC0 |= 0b1 << 11; // Enable INT2 external input interrupt
+    IFS0 &= 0xFFFFF7FF; // Set flag status to 0
+    IPC2 |=  0b011 << 26; // Set priority to 3
+    IPC2 |=  0b10 << 24; // Set subpriority to 2
+    INTCON |= 0b1 << 2; // Configure to trigger on rising edge 
+        
+    \end{verbatim}
+\end{itemize}
+
+\section*{Exercise 13}
+Setting SS0 to 1, MVEC to 0, INT3EP to 1, and leaving the rest as defaults means SFR INTCON = \verb|0x00010008|.
+
+\section*{Exercise 19}
+See \verb|interruptFreq.c|.
+
+\end{document}
