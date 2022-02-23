@@ -1,0 +1,222 @@
+\documentclass[12pt]{article}
+
+% Packages 
+\usepackage{amsmath}
+\usepackage{datetime}
+\usepackage{graphicx}
+\usepackage{listings}
+
+\graphicspath{{./images/}}
+
+\newdate{date}{23}{02}{2022}
+\title{
+    Assignment 5 
+
+    \large{
+        ME EN 6240 Advanced Mechatronics
+    }  
+}
+    
+\author{
+        Ryan Dalby
+}
+\date{\displaydate{date}}
+
+
+\begin{document}
+\maketitle
+
+\section*{Exercise 3}
+\verb|mathPIC.c| contains code for this problem.
+
+\begin{itemize}
+    \item[a.]
+    Operations with jumps:
+    \begin{itemize}
+        \item
+        \verb|j3=j1/j2|
+        \item
+        \verb|f3 = f1+f2;|
+        \item
+        \verb|f3 = f1-f2;|
+        \item
+        \verb|f3 = f1*f2;|
+        \item
+        \verb|f3 = f1/f2;|
+        \item
+        \verb|d3 = d1+d2;|
+        \item
+        \verb|d3 = d1-d2;|
+        \item
+        \verb|d3 = d1*d2;|
+        \item
+        \verb|d3 = d1/d2;|
+    \end{itemize}
+
+    Assembly code example with jump:
+    \begin{verbatim}
+        d3 = d1/d2;
+    9d0031a8:	8fc40038 	lw	a0,56(s8)
+    9d0031ac:	8fc5003c 	lw	a1,60(s8)
+    9d0031b0:	8fc60040 	lw	a2,64(s8)
+    9d0031b4:	8fc70044 	lw	a3,68(s8)
+    9d0031b8:	0f400780 	jal	9d001e00 <__divdf3>
+    9d0031bc:	00000000 	nop
+    9d0031c0:	afc20060 	sw	v0,96(s8)
+    9d0031c4:	afc30064 	sw	v1,100(s8)
+
+    9d001e00 <__divdf3>:
+    9d001e00:	00055040 000a5542 00054ac0 00047d42   
+    9d001e10:	012f4825 000442c0 3c0e8000 012e4825   
+    9d001e20:	00076840 000d6d42 000762c0 00067d42  
+    9d001e30:	018f6025 00065ac0 018e6025 00a72826 
+    9d001e40:	00ae2824 254fffff 2de107fe 102000cb
+    9d001e50:	00000000                          
+    \end{verbatim}
+
+    \item[b.]
+    For statements with no jumps, integer addition (and subtraction) results in the fewest assembly commands.
+
+    \begin{verbatim}
+        i3 = i1+i2;
+    9d002fd4:	8fc30014 	lw	v1,20(s8)
+    9d002fd8:	8fc20018 	lw	v0,24(s8)
+    9d002fdc:	00621021 	addu	v0,v1,v0
+    9d002fe0:	afc2004c 	sw	v0,76(s8)
+    \end{verbatim}
+
+    Char does not results in the least operations.
+    This is because the PIC32 is a 32bit CPU and thus performs 32bit operations, for a char which is 8 bits extra 0s are added in front to make the char be able to operate with the 32bit CPU.
+    The operation is then performed and the extra operations clear the unnecessary results from the padded calculation.
+    The int datatype can perform directly without these padding/shifting commands.
+
+    \item[c.]
+    \begin{tabular}{|c|c|c|c|c|c|}
+        \hline
+        & char & int & long long & float & long double \\
+        \hline
+        + & 1.25(5) & 1.0(4) & 2.75(11) & 1.25(5)J&  2.0(8)J\\
+        \hline
+        - & 1.25(5) & 1.0(4) & 2.75(11) & 1.25(5)J&  2.0(8)J\\
+        \hline
+        * & 1.5(6) & 1.25(5) & 4.75 (19) & 1.25(5)J&  2.0(8)J\\
+        \hline
+        / & 1.75(7) & 1.75(7) & 3.0(12)J & 1.25(5)J&  2.0(8)J\\
+        \hline
+        
+    \end{tabular}
+
+    \item[d.]
+
+    \begin{verbatim}
+
+    __divdf3 is located at address 0x9d001e00 
+    and takes up approximately 0x4b8=1208 bytes of memory.
+
+    __divdi3 is located at address 0x9d0022b8 
+    and takes up approximately 0x4b4=1204 bytes of memory.
+
+    __subdf3 and __adddf3 are located at address 0x9d00276c 
+    and take up approximately 0x430=1072 bytes of memory.
+
+    __muldf3 is located at address 0x9d002b9c 
+    and takes up approximately 0x32c=812 bytes of memory.
+
+    __subsf3 and __addsf3 are located at address 0x9d003498 
+    and take up approximately 0x278=632 bytes of memory.
+
+    __divsf3 is located at address 0x9d003710 
+    and takes up approximately 0x230=560 bytes of memory.
+
+    __mulsf3 is located at address 0x9d003940 
+    and takes up approximately 0x1bc=444 bytes of memory.
+
+    \end{verbatim}
+
+    \end{itemize}
+
+
+\section*{Exercise 4}
+\verb|bitManip.c| contains code for this problem.
+\begin{itemize}
+    \item 
+    \verb|u3 = u1 & u2;|
+    This uses 4 commands.
+
+    \item 
+    \verb<u3 = u1 | u2;<
+    This uses 4 commands.
+
+    \item 
+    \verb|u3 = u2 << 4;|
+    This uses 3 commands.
+
+    \item 
+    \verb|u3 = u1 >> 3;|
+    This uses 3 commands.
+
+\end{itemize}
+
+\section*{Exercise 6}
+\verb|mathFuncTest.c| contains code for this problem.
+\begin{itemize}
+    \item[a.]
+    \begin{verbatim}
+        Averaged over 10 calls to each function the execution time of each is:
+
+        cosf(f1):
+        2562 ns
+
+        sqrtf(f1):
+        3410 ns
+
+        cos(d1):
+        3460 ns
+
+        sqrt(d1):
+        4290 ns
+
+    \end{verbatim}
+
+    \item[b.]
+    \begin{verbatim}
+          f2 = cosf(f1);
+        9d0028bc:	8fc40010 	lw	a0,16(s8)
+        9d0028c0:	0f400fd5 	jal	9d003f54 <cosf>
+        9d0028c4:	00000000 	nop
+        9d0028c8:	afc20020 	sw	v0,32(s8)
+
+          d2 = cos(d1);
+        9d002b1c:	8fc40018 	lw	a0,24(s8)
+        9d002b20:	8fc5001c 	lw	a1,28(s8)
+        9d002b24:	0f40105e 	jal	9d004178 <__truncdfsf2>
+        9d002b28:	00000000 	nop
+        9d002b2c:	00402021 	move	a0,v0
+        9d002b30:	0f400fd5 	jal	9d003f54 <cosf>
+        9d002b34:	00000000 	nop
+        9d002b38:	00402021 	move	a0,v0
+        9d002b3c:	0f401217 	jal	9d00485c <__extendsfdf2>
+        9d002b40:	00000000 	nop
+        9d002b44:	afc20028 	sw	v0,40(s8)
+        9d002b48:	afc3002c 	sw	v1,44(s8)
+    \end{verbatim}
+    Comparing cosf and cos we can see that cos can perform on an eight byte double floating point numbers and give a more accurate cosine estimation.
+    The cosf routine takes less instructions than cos and in practice is a quicker execution as shown in a.
+    The cosf routine also only performs with four byte floats and gives a less accurate estimation of cosine.
+    The cos routine actually calls cosf after doing some bitwise manipulation.
+
+    \item[c.]
+    The libm.a file in 
+    
+    \begin{lstlisting}[breaklines]
+    c:/program files (x86)/microchip/xc32/v2.30/bin/bin/../../lib/gcc/pic32mx/4.8.3/../../../../pic32mx/lib
+    \end{lstlisting}
+
+    was used by the linker.
+\end{itemize}
+
+\section*{Exercise 10}
+% Global variables are stored at the beginning addresses of RAM, then next on "top" of that is the "heap", then on the very top is the "stack"
+\verb|glob[5000]| occupies 20000 bytes in global memory, which assuming no memory on heap and 128KB = 131072 bytes of RAM, the largest size of an array of ints could take up 121072 bytes thus giving a max local int array of size 30268.
+
+\end{document}

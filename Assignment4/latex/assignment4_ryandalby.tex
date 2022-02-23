@@ -1,0 +1,158 @@
+\documentclass[12pt]{article}
+
+% Packages 
+\usepackage{amsmath}
+\usepackage{datetime}
+\usepackage{graphicx}
+
+\graphicspath{{./images/}}
+
+\newdate{date}{16}{02}{2022}
+\title{
+    Assignment 4 
+
+    \large{
+        ME EN 6240 Advanced Mechatronics
+    }  
+}
+    
+\author{
+        Ryan Dalby
+}
+\date{\displaydate{date}}
+
+
+\begin{document}
+\maketitle
+
+\section*{Exercise 1}
+Private to \verb|NU32.c|:
+\begin{itemize}
+    \item 
+    \verb|__builtin_enable_interrupts()|
+
+    \item
+    \verb|NU32_DESIRED_BAUD|
+
+    \item
+    \verb|__builtin_disable_interrupts()|
+
+    \item
+    \verb|__builtin_mtc0()|
+
+    \item 
+    \verb|CHECONbits.PFMWS|
+
+    \item 
+    \verb|CHECONbits.PREFEN|
+    \item 
+    \verb|BMXCONbits.BMXWSDRM|
+
+    \item 
+    \verb|INTCONbits.MVEC|
+
+    \item 
+    \verb|DDPCONbits.JTAGEN|
+
+    \item 
+    \verb|TRISFCLR|
+
+    \item 
+    \verb|NU32_LED1|
+
+    \item 
+    \verb|NU32_LED2|
+
+    \item 
+    \verb|U3MODEbits.BRGH|
+
+    \item 
+    \verb|U3BRG|
+
+    \item 
+    \verb|U3MODEbits.PDSEL|
+
+    \item 
+    \verb|U3MODEbits.STSEL|
+
+    \item 
+    \verb|U3STAbits.UTXEN|
+
+    \item 
+    \verb|U3STAbits.URXEN|
+
+    \item 
+    \verb|U3MODEbits.UEN|
+
+    \item 
+    \verb|U3MODEbits.ON|
+
+    \item 
+    \verb|U3STAbits.URXDA|
+
+    \item 
+    \verb|U3STAbits.URXBF|
+
+    \item 
+    \verb|U3TXREG|
+    
+    \item 
+    \verb|U3STAbits.URXDA|
+
+    \item 
+    All pragma config variables for device configuration variables
+
+\end{itemize}
+To be used in other files than \verb|NU32.c|:
+\begin{itemize}
+    \item
+    \verb|NU32_ReadUART3()|
+
+    \item
+    \verb|NU32_WriteUART3()|
+
+    \item
+    \verb|NU32_Startup()|
+
+    \item
+    \verb|NU32_SYS_FREQ|
+
+    \item
+    \verb|NU32_USER|
+
+    \item
+    \verb|NU32_LED1|
+
+    \item
+    \verb|NU32_LED2|
+
+    \item
+    Public things in \verb|xc.h| or \verb|sys/attribs.h|
+\end{itemize}
+
+\section*{Exercise 2}
+\begin{enumerate}
+    \item[a.]
+    See \verb|ex2a\*|.
+
+    \item[b.]
+    See \verb|ex2b\*|.
+    
+    I chose to put struct, defines, and all declarations of functions in the .h header file.
+    This is because these are things that are needed before linking.
+    I chose to put the definitions of all functions in the .c file.
+    I also put all includes in the .c file since none of them are needed for declarations in the .h file.
+
+    \item[c.]
+    See \verb|ex2c\*|.
+
+    I chose to break up the struct definition into its own header file called \verb|investment.c| because both the io functions in \verb|io.c| and in \verb|calculate.c| need the struct.
+    \verb|main.c| also needs the investment struct so it just includes \verb|investment.h| and it will be able to use it.
+    For functions I put all declarations of io functions(\verb|getUserInput()| and \verb|sendOutput|) in \verb|io.h| and \verb|calculateGrowth()| in \verb|calculate.h|.
+    The definitions of these functions where then in their corresponding .c file.
+    For the constants I made sure to put them in a place where every thing that would need them would have access but anything that didn't wouldn't know about it, for example I put the \verb|MAX_YEARS| in \verb|investment.h|.
+    Once again I also put all the includes in the .c file unless they were necessary for the declaration like for the functions in \verb|investment.c| and \verb|io.c|.
+
+\end{enumerate}
+
+\end{document}

@@ -1,0 +1,133 @@
+\documentclass[12pt]{article}
+
+% Packages 
+\usepackage{amsmath}
+\usepackage{datetime}
+\usepackage{graphicx}
+
+\graphicspath{{./images/}}
+
+\newdate{date}{07}{02}{2022}
+\title{
+    Assignment 2 
+
+    \large{
+        ME EN 6240 Advanced Mechatronics
+    }  
+}
+    
+\author{
+        Ryan Dalby
+}
+\date{\displaydate{date}}
+
+
+\begin{document}
+\maketitle
+
+% Note that many bits in memory are unimplemented/blank because of scalability of creating silicon(should be used in multiple products)
+
+\subsection*{Exercise 3.}
+Four functions of pin 12:
+\begin{enumerate}
+    \item 
+    AN4 provides analog input 
+
+    \item 
+    C1IN- can act as a comparator 
+    % (compares voltage against C1IN+ (can be configured on pin 13))
+
+    \item 
+    CN6 is a change notification which triggers an interrupt
+
+    \item 
+    RB4 is a digital input/output 
+
+\end{enumerate}
+
+Pin 12 is not 5V tolerant
+
+\subsection*{Exercise 4.}
+The name of the SFR is TRISC and you would have to set it to 0x0000F000 (setting each corresponding bit of TRISC to 1 turns it into an input as per the data sheet).
+
+\subsection*{Exercise 5.}
+The reset value of CM1CON is 0x000000C3.
+
+\subsection*{Exercise 6.}
+\begin{itemize}
+    \item 
+    SYSCLK is the CPU clock that the CPU uses as a reference for its operations
+
+    \item 
+    PBCLK is the clock that is used for communication/use with peripherals 
+
+    \item 
+    PORTA to PORTG are digital inputs and outputs with 32 bits which may or may not be implemented (PORTB has analog input too).
+    % These are abstract of physical pins, which can be configured via special function registers to give on of the functions of PORTA to PORT G or many other peripherals (ADC, timer, etc.)
+
+    \item 
+    Timer1 to Timer5 are used to count, can be configured to be more accurate by using the timers together (more bits of resolution).
+    % The CPU is not involved.
+
+    \item 
+    10-bit ADC is an analog to digital converter. 
+
+    \item 
+    PWM OC1-5 can produce a pulse train with a specific frequency, giving pulse width modulation if wanted.
+
+    \item
+    Data RAM is fast access memory that is volatile (it will disappear when power is turned off).
+
+    \item
+    Program flash memory is memory that is slower access but is non-volatile (persists even with the power off).
+
+    \item
+    Prefetch cache module attempts to ``look ahead" to fetch instructions from flash memory so the CPU can access some instructions much faster.
+
+\end{itemize}
+
+\subsection*{Exercise 7.}
+PORTA to PORTG, USB, CAN1 CAN2, ETHERNET, DMAC, ICD, Data RAM, Prefetch Module, Priority interrupt controller, peripheral bridge, JTAG BSCAN. 
+
+\subsection*{Exercise 8.}
+% 0 1024 values (0 to 1023) between 0.0 map to 0.0 to 3.3 -> 3.3V/1024=0.003222656
+The largest voltage difference it may not be able to detect would be approximately 0.0032 V
+
+\subsection*{Exercise 9.}
+256 bytes 
+
+\subsection*{Exercise 10.}
+The cache module is 128 bits wide which is 4 times the size of 32 bits, this is because the CPU is 4 (approximately) times faster than the flash, this can keep the CPU busy for every cycle.
+A 32 and 64 bit wide cache is not enough to keep the CPU busy for every cycle, 256 bits on the other hand is of not any better since the CPU would become the bottleneck.
+
+\subsection*{Exercise 11.}
+Using the open-drain feature it is possible to make digital outputs generate voltages higher than 3.3 V using an external pullup resistor (voltage dependent on external circuitry).
+
+\subsection*{Exercise 12.}
+0x1D000000
+
+\subsection*{Exercise 13.}
+\begin{enumerate}
+    \item 
+    DEVCFG1 bits 13-12 (FPBDIV) should be set to 01
+
+    \item 
+    DEVCFG1 bit 23 (FWDTEN) should be set to 01 to enable the watchdog timer.
+    DEVCFG1 bits 20-16 (WDTPS) should be set to 10100 to set watchdog timer interval to the be the biggest (smallest postscale value).
+
+    \item 
+    DEVCFG1 bits 2-0 (FNOSC) to 011  enablse the primary oscillator and turns on the PLL module.
+
+\end{enumerate}
+
+\subsection*{Exercise 14.}
+Using ohms law and solving for resistance we $R = \frac{V}{I}$ where we take current to be the maximum tolerable on the PIC of 300 mA and the voltage to be 5V we get that we need a resistor of at least (approximately) 16.67 ohms.
+
+\subsection*{Exercise 15.}
+The NU32 should be powered by voltages between around 2.3V (the minimum voltage for the PIC32) to 9V (the max (before heating issues) for the 3.3V regulator on the NU32).
+
+\subsection*{Exercise 16.}
+USER is pin 55 and function RD7.
+RESET is pin 7 and function MCLR.
+
+\end{document}

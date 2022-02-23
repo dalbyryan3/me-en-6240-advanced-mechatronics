@@ -12,6 +12,14 @@ bin/
 *.pkl
 *.exe
 *.pdf
+*.o
+*.ld
+*.dis
+*.elf
+*.hex
+*.map
+*.00
+*.vim
 
 ###
 ### Latex gitignore:

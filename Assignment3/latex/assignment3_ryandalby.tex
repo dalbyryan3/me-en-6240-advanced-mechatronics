@@ -1,0 +1,165 @@
+\documentclass[12pt]{article}
+
+% Packages 
+\usepackage{amsmath}
+\usepackage{datetime}
+\usepackage{graphicx}
+
+\graphicspath{{./images/}}
+
+\newdate{date}{14}{02}{2022}
+\title{
+    Assignment 3 
+
+    \large{
+        ME EN 6240 Advanced Mechatronics
+    }  
+}
+    
+\author{
+        Ryan Dalby
+}
+\date{\displaydate{date}}
+
+
+\begin{document}
+\maketitle
+
+
+% Virtual memory (at least on the PIC, for other architectures virtual memory may abstract multiple processes memory spaces) on the PIC is used because it can encode caching information (if cachable etc.) in a way that makes it easy for the CPU to understand if it should check cache or not. 
+% In general virtual memory can encode meta information about memory (information about information(memory)) directly in the structure of the virtual address.
+% Allows part of the program flash, RAM, etc. to be cachable rather than having to have the whole thing be either cachable or non-cachable.
+
+\subsection*{Exercise 1.}
+\begin{itemize}
+    \item [a.] 
+    0x80000020 is cacheable data RAM, points to 0x00000020 in physical memory
+
+    \item [b.] 
+    0xA0000020 non-cachable data RAM, points to 0x00000020 in physical memory
+
+    \item [c.] 
+    0xBF800001 non-cachable SFR, points to 0x00000001 in physical memory
+
+    \item [d.] 
+    0x9FC00111 cachable boot flash, points to 0x00000111 in physical memory 
+
+    \item [e.] 
+    0x9D001000 cachable program flash, points to 0x00001000 in physical memory
+
+\end{itemize}
+
+\subsection*{Exercise 2.}
+(0xBD000000 + 0x1000 + 0x970) = 0xBD001970 is where bootloader installs the users program in virtual memory
+
+\subsection*{Exercise 3.}
+\begin{itemize}
+    \item [a.] 
+    (Assumed using PIC32MX795F512H)
+
+    For PORT B bits 0-15 can be used for input/output
+
+    For PORT C bits 12-15 can be used for input/output
+
+    For PORT D bits 0-11 can be used for input/output
+
+    For PORT E bits 0-7 can be used for input/output
+
+    For PORT F bits 0-1 and 3-5 can be used for input/output
+
+    For PORT G bits 2-3 and 6-9 can be used for input/output
+
+    RE0 (bit 0 of PORTE) corresponds to pin 60.
+
+    \item [b.] 
+    Bits 5-7, 11, 13-15, 17-31 are unimplemented.
+
+    SS0(bit 16), MVEC (bit 12), TPC(bits 8-10), INT4EP(bit 4), INT3EP(bit 3), INT2EP(bit 2), INT1EP(bit 1), INT0EP(Bit 0) are implemented.
+
+\end{itemize}
+
+\subsection*{Exercise 4.}
+See \verb|simplePIC_ex4.c|
+
+\subsection*{Exercise 5.}
+See \verb|simplePIC_ex5.c|
+
+\subsection*{Exercise 6.}
+I2C3CON virtual address is BF805000 reset value is is 00001000.
+
+TRISC virtual address is BF886080 reset value is is 0000F000.
+
+\subsection*{Exercise 7.}
+% processor.o file gives what the values are of the virtual memory addresses are, contains all peripheral addresses
+
+The simplePIC.c project is much larger than the final .hex file because it contains all possible peripheral addresses (processor.o contains definitions) then when the linker links to create the final .hex executable it doesn't need most of those peripheral address definitions so it strips the unneeded ones.
+
+
+\subsection*{Exercise 8.}
+\begin{itemize}
+    \item [a.]
+
+    \verb|and     a0,a0,0|
+
+    \verb|and     a1,a1,0|
+
+    \verb|la      t0,_main_entry|
+
+    \verb|jr      t0|
+
+    \verb|nop|
+
+    \verb|.end _startup|
+
+
+    \item [b.]
+    bf88cb48 A C2FIFOCI31SET
+
+    bf88cb4c A C2FIFOCI31INV
+    
+    bfc02ff0 A DEVCFG3
+
+    bfc02ff4 A DEVCFG2
+
+    bfc02ff8 A DEVCFG1
+
+    bfc02ffc A DEVCFG0
+
+    \item [c.]
+    There are 10 bit fields in SPI2STAT.
+    They are (name:size):
+
+    SPIRBF:1
+
+    SPITBF:1
+
+    SPITBE:1
+
+    SPIRBE:1
+    
+    SPIROV:1
+
+    SRMT:1
+
+    SPITUR:1
+
+    SPIBUSY:1
+
+    TXBUFELM:5
+
+    RXBUFELM:5
+
+    Yes, these directly align with the datasheet.
+
+\end{itemize}
+
+\subsection*{Exercise 9.}
+TRISDSET = 0xC = 0b1100 (set bits 2 and 3 to 1)
+TRISDCLR = 0x22 = 0b00100010 (clear bits 1 and 5)
+TRISDINV = 0x11 = 0b10001 (flip bits 0 and 4)
+
+% Random note, the keyword volatile specifies to the compiler that the indicated thing can change external to the program (means compiler shouldn't make assumptions about the value of the variable when optimizing).
+
+% The extern keyword means that the definition of the variable is else where and to make the linker look for its value (resolving is deferred to the linker)
+
+\end{document}
