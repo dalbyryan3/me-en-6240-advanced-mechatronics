@@ -1,0 +1,91 @@
+\documentclass[12pt]{article}
+
+% Packages 
+\usepackage{amsmath}
+\usepackage{datetime}
+\usepackage{graphicx}
+\usepackage{listings}
+
+\graphicspath{{./images/}}
+
+\newdate{date}{14}{03}{2022}
+\title{
+    Assignment 7-8-9-10 
+
+    \large{
+        ME EN 6240 Advanced Mechatronics
+    }  
+}
+    
+\author{
+        Ryan Dalby
+}
+\date{\displaydate{date}}
+
+
+\begin{document}
+\maketitle
+
+\section*{Chapter 7, Exercise 1}
+False, an input pin that is not connected to anything doesn't always read digital low, it depends on if the pin is configured to use the internal pullup resistor is used which can give a voltage reading when the input is ``floating'' (not connected to anything externally).
+
+\section*{Chapter 7, Exercise 2}
+\begin{itemize}
+    \item [1.]
+    Digital pin 2 which is an open-drain digital output would most likely have an external pullup resistor.
+    A reasonable range of resistances would be a lower limit of 500 ohms (Assuming a 5V external input and not wanting to exceed 10mA of current into the PIC (ohms law gives 5V/100mA = 500 ohms)).
+    The upper limit of the resistance range could be calculated similarly for a minimum desired current into the PIC, but theoretically could be as high as possible.
+
+    \item [2.]
+    \begin{verbatim}
+    AD1PCFG = 0x0000001E
+    TRISB = 0x0000FFF9
+    ODCB = 0x00000004
+    CNPUE = 0x00000010
+    CNCON = 0x00008000
+    CNEN = 0x00000020
+        
+    \end{verbatim}
+\end{itemize}
+
+\section*{Chapter 8, Exercise 1}
+\verb|T3CON| should be set to \verb|0x8060|.
+\verb|PR3| should be set to 19999 = (80000000(pulses/s)/64 * 0.016s) - 1 = \verb|4E1F|.
+
+\section*{Chapter 8, Exercise 2}
+A 32-bit timer gives $2^{32}$ possible counts.
+With 80000000 pulses/second possible with the 80MHz clock and using the maximum prescaler of 256 gives $\frac{80000000}{256} = 312500$ (counts/second).
+Thus the longest duration that can be timed before rollover is $\frac{2^{32}}{312500} \approx 13743.9$ seconds.
+
+\section*{Programming Exercise}
+See \verb|interactiveLEDToggle.c|.
+
+\section*{Chapter 9, Exercise 1}
+Constraints: 
+\[f_{pwm} \ge 100 f_c, \quad f_c \ge 10 f_a\]
+
+Given:
+\[f_{pwm} = \frac{80000000}{2^n}\]
+\[f_c = \frac{1}{2 \pi R C}\]
+
+Applying constraints here:
+\[f_{pwm} = 1000 f_{a}\]
+\[f_{a} = \frac{1}{1000}f_{pwm} = \frac{80000000}{(1000) 2^n}\]
+
+And applying constraints here:
+\[f_a = \frac{f_c}{10} = \frac{1}{20 \pi RC}\]
+\[\frac{80000000}{2^n 1000} = \frac{1}{20 \pi RC}\]
+
+Gives:
+\[RC = \frac{2^n 1000}{1600000000 \pi} = \frac{2^n}{1600000 \pi}\]
+
+
+\section*{Chapter 10, Exercise 2}
+See \verb|ADC_reader.c| (specifically function \verb|adc_sample_convert|).
+
+\section*{Chapter 10, Exercise 3}
+See \verb|ADC_reporter.c|.
+This was tested on a voltage divider circuit using two 1 M$\Omega$ resistors in series and the 3.3V NU32 output voltage where close to the expected divided 1.65V was read.
+    
+
+\end{document}

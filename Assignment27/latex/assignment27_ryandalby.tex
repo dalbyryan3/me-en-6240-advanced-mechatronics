@@ -1,0 +1,139 @@
+\documentclass[12pt]{article}
+
+% Packages 
+\usepackage{amsmath}
+\usepackage{datetime}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{gensymb}
+
+\graphicspath{{./images/}}
+
+\newdate{date}{30}{03}{2022}
+\title{
+    Assignment 27 
+
+    \large{
+        ME EN 6240 Advanced Mechatronics
+    }  
+}
+    
+\author{
+        Ryan Dalby
+}
+\date{\displaydate{date}}
+
+\setlength\parindent{0pt}
+
+\begin{document}
+\maketitle
+
+\section*{Exercise 3}
+\begin{itemize}
+    % Assuming stalled, or else would have to add a back emf from motor spinning
+    \item 
+    Diode 2
+
+    \item 
+    $V_M = (-10V-0.7V) = -10.7V$
+    
+    % (Note $V_M = V_R + V_L$)
+
+    \item 
+    $I = 2A$ (Same as steady state ($I=\frac{V}{R}=\frac{10}{5} = 2A$))
+
+    \item 
+    $V_L = -20.7V = L \frac{dI}{dt}$ 
+
+    % (Note $V_R = 10V$)
+
+    $\frac{dI}{dt} = \frac{-20.7 V}{0.001 H} = -20700 A/s$
+
+    % Remember what really matters is voltage differences not really the actual values of the voltages themselves, voltage itself is a relative quantity.
+    % Remember if you are given a voltage across an inductor then you don't really know anything about the current directions itself, you only know about the rate of change of the current (this is because of the definition of an inductor voltage)
+
+\end{itemize}
+
+\section*{Exercise 4}
+Advantage of H-bridge with PWM over linear push-pull amplifier with an analog control input:
+\begin{itemize}
+    \item 
+    Producing PWM is usually much cheaper than producing a good analog control input.
+
+    \item
+    Generally more efficient and can come in a much smaller package.
+
+
+\end{itemize}
+
+Advantage linear push-pull amplifier with an analog control input of over H-bridge with PWM:
+\begin{itemize}
+    \item 
+    With a low frequency PWM can result in a visible rate of change in voltage (time constant is slow) rather than an appeared averaged (analog-like) signal.
+
+    Somewhat similarly a low inductance motor can result in bigger changes in voltage due to the modulated PWM signal (like having a ``low mass'')
+\end{itemize}
+
+\section*{Exercise 5}
+$V = k_e \omega + IR + L\frac{dI}{dt} = k_t \omega + IR$ (Ignoring immediate inductance effects)
+
+When shorting motor (ideal scenario no mechanical losses):
+
+$V_m = k_e \omega + IR = 0 $  % (k_e \omega is the back emf)
+
+$\omega = -\frac{IR}{k_e}$
+
+$I = \frac{\tau_M}{k_t}$
+
+$\omega = -\frac{IR}{k_e} = -\frac{R}{k_t^2}\tau_M$
+
+$\tau_M = \frac{-k_t^2}{R}\omega = J \dot\omega$
+
+$IR = -k_e \omega - V_m$
+
+When the motor is shorted then the motor comes to rest faster because there is current still flowing that corresponds to a negative torque as seen in the equations above which relate the torque of the motor having a non-zero value to the rate of change of the angular speed times some ``mass''. 
+In summary, there is essentially a large electrical load (due to the short) that results in current flowing rapidly (caused by back-emf voltage and a low resistance path) which corresponds to a negative torque against the angular velocity and so slowing down happens quickly (rotational energy is dissipated quickly as a electrical energy).
+
+When switches are open (ideal scenario no mechanical losses):
+
+$V_m = k_e \omega $ 
+
+$\tau_M = k_t I = 0$
+
+When the switches are just open and no current flows then the slow down is just due to mechanical resistances (friction etc.) creating a torque that brings the motor to a slow stop.
+In the idealized equations above this would mean the motor would spin forever but in practice there are mechanical losses.
+In summary, there is no electrical load that would result in current flowing thus no torque occurs to oppose the angular velocity so slowing down happens much slower (roational energy is never dissipated as electrical energy since there is no current flow (even though there is a voltage from the back-emf)).
+
+\section*{Exercise 7}
+Calculations: 
+(Note $V_M$ is the voltage of the motor, $V_B$ is the voltage of the battery (Called $V_m$ in the problem statement) and $V_D$ forward bias voltage of the flyback diodes)
+
+$V_M = 2V_D + V_B$
+
+$V_M = k_e \omega + I_M R$ (Neglecting $\frac{dI}{dt}L$)
+
+
+\begin{itemize}
+    \item 
+    $\omega$ when battery charging occurs ($P_B < 0$):
+    \[
+        \omega > \frac{2 V_D + V_B}{K_e}
+    \]
+
+    \item
+    $I_M(\omega)$:
+    \[
+        I_M(\omega) = \frac{2 V_D + V_B - k_e \omega}{R}
+    \]
+    \item
+    $P_{heat loss}$:
+    \[
+        P_{heat loss} = I V_M - I k_e \omega = I (V_M - k_e \omega)
+    \]
+    \item
+    The total energy of water before being used in the hydrogenerator is higher in terms of total energy, this is because there is more potential energy at the top of the dam and the act of going through the dam converts that energy to kinetic energy of which much of it is taken from the water by pushing the turbine.
+    Thus at the bottom of the dam after being used in the hydrogenerator, the total energy of the water is less than if the water hadn't gone through the hydrogenerator because some of the kinetic energy was used to move the turbine.
+
+\end{itemize}
+
+\end{document}
