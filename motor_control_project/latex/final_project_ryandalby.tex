@@ -87,6 +87,7 @@ If a 32-bit timer for a loop is needed I can use timer45 and then use timer1 for
 If two 32-bit timers are needed this won't really be possible because timer23 will be being used for PWM.
 
 I will give both ISRs for position and current control the same priority so neither will interrupt each other once one begins and give a higher subpriority to the position control ISR since it occurs less often and I would like to make sure when it needs to execute it will be ahead of the current control ISR which occurs much more frequently.
+% Prof suggests current control priority above position...
 
 \section*{5.}
 \textit{Based on your answers to these questions, and your understanding of the project, annotate the block diagram of Figure 27.7. Each block should clearly indicate which devices or peripherals perform the operation in the block, and each signal line should clearly indicate how the signal is carried from one block to the other. (After this step, there should be no question about the hardware involved in the project. The details of wiring the H-bridge, current sensor, and encoder are left to later.)}

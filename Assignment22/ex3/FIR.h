@@ -13,7 +13,7 @@ typedef struct {
 
 // Declare public functions
 void initFilterInformation(FIRFilterInformation *filterInfoPtr, int filterOrder, double *bValues, double *memory);
-void updateMemory(FIRFilterInformation *filterInfo, double signal_val);
-double filterSignal(FIRFilterInformation *filterInfo, double signal_val);
+void updateMemory(FIRFilterInformation *filterInfoPtr, double signal_val);
+double filterSignal(FIRFilterInformation *filterInfoPtr, double signal_val);
 
 #endif
