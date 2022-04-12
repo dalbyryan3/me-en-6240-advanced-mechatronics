@@ -3,6 +3,7 @@
 
 static int encoder_command(int read) { // send a command to the encoder chip
                                        // 0 = reset count to 32,768, 1 = return the count
+
   SPI4BUF = read;                      // send the command
   while (!SPI4STATbits.SPIRBF) { ; }   // wait for the response
   SPI4BUF;                             // garbage was transferred, ignore it
