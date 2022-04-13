@@ -1,6 +1,9 @@
 #include "encoder.h"                   
 #include <xc.h>
 
+// The motor being used has 48 counts per revolution
+#define ENCODER_COUNTS_PER_REV 48
+
 static int encoder_command(int read) { // send a command to the encoder chip
                                        // 0 = reset count to 32,768, 1 = return the count
 
@@ -9,12 +12,22 @@ static int encoder_command(int read) { // send a command to the encoder chip
   SPI4BUF;                             // garbage was transferred, ignore it
   SPI4BUF = 5;                         // write garbage, but the read will have the data
   while (!SPI4STATbits.SPIRBF) { ; }
-  SPI4BUF;
+  // SPI4BUF; // Why is this needed? Do realize sometimes it takes two encoder_counts() calls to get new enocder value...
   return SPI4BUF;
 }
 
 int encoder_counts(void) {
+  encoder_command(1);
   return encoder_command(1);
+}
+
+void encoder_reset_counts(void) {
+  encoder_command(0);
+}
+
+double encoder_counts_deg(void){
+  double shifted_counts = 32768 - encoder_counts();
+  return 360.0 * (shifted_counts)/((double)ENCODER_COUNTS_PER_REV);
 }
 
 void encoder_init(void) {

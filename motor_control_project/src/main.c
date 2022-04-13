@@ -21,17 +21,19 @@ int main()
     NU32_ReadUART3(buffer,BUF_SIZE); // we expect the next character to be a menu command
     NU32_LED2 = 1;                   // clear the error LED
     switch (buffer[0]) {
-      case 'd':                      // dummy command for demonstration purposes
-      {
-        int n = 0;
-        NU32_ReadUART3(buffer,BUF_SIZE);
-        sscanf(buffer, "%d", &n);
-        sprintf(buffer,"%d\r\n", n + 1); // return the number + 1
-        NU32_WriteUART3(buffer);
-        break;
-      }
+      // case 'd':                      
+      // {
+      //   // dummy command for demonstration purposes
+      //   int n = 0;
+      //   NU32_ReadUART3(buffer,BUF_SIZE);
+      //   sscanf(buffer, "%d", &n);
+      //   sprintf(buffer,"%d\r\n", n + 1); // return the number + 1
+      //   NU32_WriteUART3(buffer);
+      //   break;
+      // }
       case 'x':
       {
+        // Add two numbers and give result
         int n1, n2, res;
 
         NU32_ReadUART3(buffer,BUF_SIZE);
@@ -43,9 +45,25 @@ int main()
         NU32_WriteUART3(buffer);
         break;
       }
-      case 'c':
+      case 'c': 
       {
-        sprintf(buffer, "%d", encoder_counts());
+        // Get encoder counts
+        // sprintf(buffer, "%d", encoder_counts());
+        sprintf(buffer, "%d\r\n", encoder_counts());
+        NU32_WriteUART3(buffer); // send encoder count to client 
+        break;
+      }
+      case 'e':
+      {
+        // Reset encoder count to 32768
+        encoder_reset_counts();
+        break;
+      }
+      case 'd': 
+      {
+        // Get encoder counts converted to degrees
+        // sprintf(buffer, "%f", encoder_counts_deg());
+        sprintf(buffer, "%f\r\n", encoder_counts_deg());
         NU32_WriteUART3(buffer); // send encoder count to client 
         break;
       }
@@ -56,6 +74,7 @@ int main()
       }
       default:
       {
+        // Error case
         NU32_LED2 = 0;  // turn on LED2 to indicate an error
         break;
       }

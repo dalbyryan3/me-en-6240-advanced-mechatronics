@@ -99,6 +99,9 @@ I will give both ISRs for position and current control the same priority so neit
 \section*{6.}
 \textit{Based on which circuit boards need to be connected to which pins of the NU32, and the connections of the circuit boards to the motor and encoder, sketch a proposed layout of the circuit boards relative to the NU32 so that wire crossing is approximately minimized. (Do not make a full circuit diagram at this time.)}
 
+Note the circuit diagram for the NU32 shown below does not exactly match the physical NU32, likely it is a slightly different iteration of the NU32. 
+Still it allows the sketch to get the idea of what connections are needed across.
+
 \begin{center}
     \includegraphics[width=4in]{circuit_sketch.png}
 \end{center}
@@ -130,5 +133,28 @@ I will give both ISRs for position and current control the same priority so neit
     \item[4.]
     \textit{Change back to good gains and cubic trajectory tracking}
 \end{enumerate}
+
+
+\section*{Miscellaneous Notes}
+Step 5:
+
+$V = 6V$ % Four 1.5v batteries in series
+$R_{motor} = 3.0 \Omega$
+$I_{max} = 2V/R_{motor} = 2(6)/(3.0) = 4A$ % Worst case change from -V to +V
+$V_{max} = I_{max} (15 m\Omega) = (4) (15 \times 10^{-3}) = 0.06 V$
+
+$1.65 = G \times V_{max} = (1+\frac{R_1}{R_2}) (0.06)$
+
+$G = 27.5$
+
+$\frac{R_2}{R_1} = 26.5$
+
+% Choose $R_1 = 265 k\Omega$ and $R_2 = 10 k\Omega$
+Choose $R_2 = 330 k\Omega$ and $R_1 = 10 k\Omega$
+
+$f_c = \frac{1}{2 \pi RC} \approx 200 Hz$
+
+
+Choose $R = 1 M\Omega$ and $C = 1000 pF$
 
 \end{document}
