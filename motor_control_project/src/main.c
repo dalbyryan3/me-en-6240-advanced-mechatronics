@@ -14,6 +14,7 @@ int main()
   __builtin_disable_interrupts();
   // in future, initialize modules or peripherals here
   encoder_init();
+  adc_init();
   __builtin_enable_interrupts();
 
   while(1)
@@ -48,9 +49,8 @@ int main()
       case 'c': 
       {
         // Get encoder counts
-        // sprintf(buffer, "%d", encoder_counts());
         sprintf(buffer, "%d\r\n", encoder_counts());
-        NU32_WriteUART3(buffer); // send encoder count to client 
+        NU32_WriteUART3(buffer); // send to client 
         break;
       }
       case 'e':
@@ -62,9 +62,31 @@ int main()
       case 'd': 
       {
         // Get encoder counts converted to degrees
-        // sprintf(buffer, "%f", encoder_counts_deg());
         sprintf(buffer, "%f\r\n", encoder_counts_deg());
-        NU32_WriteUART3(buffer); // send encoder count to client 
+        NU32_WriteUART3(buffer); // send to client 
+        break;
+      }
+      case 'a': 
+      {
+        // Get ADC counts
+        sprintf(buffer, "%d\r\n", adc_counts());
+        NU32_WriteUART3(buffer); // send to client 
+
+        // sprintf(buffer, "%f\r\n", adc_voltage());
+        // NU32_WriteUART3(buffer); // send to client 
+
+        // sprintf(buffer, "%f\r\n", adc_current_sense_value_mA());
+        // NU32_WriteUART3(buffer); // send to client 
+
+        // Get averaged ADC counts
+        // NU32_WriteUART3("\r\n");
+        break;
+      }
+      case 'b': 
+      {
+        // Get ADC reading in mA
+        sprintf(buffer, "%.3f\r\n", adc_current_sense_value_mA());
+        NU32_WriteUART3(buffer); // send to client 
         break;
       }
       case 'q':

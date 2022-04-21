@@ -35,7 +35,8 @@ while ~has_quit
     fprintf('PIC32 MOTOR DRIVER INTERFACE\n\n');
     % display the menu options; this list will grow
     % fprintf('     d: Dummy Command    q: Quit\n     x: Add Two Numbers Command');
-    fprintf('     q: Quit     x: Add Two Numbers Command\n     c: Read Encoder (counts)     d: Read Encoder (deg)     e: Reset Encoder');
+    fprintf(['     q: Quit     x: Add Two Numbers Command\n     c: Read Encoder (counts)     d: Read Encoder (deg)     e: Reset Encoder\n' ...
+        '     a: Read ADC (counts)     b: Read ADC Current Sense Value (mA)']);
     % read the user's choice
     selection = input('\nENTER COMMAND: ', 's');
      
@@ -68,6 +69,14 @@ while ~has_quit
             % Get encoder counts converted to degrees
             countsDeg = fscanf(mySerial, '%f');
             fprintf('The motor angle is %.2f degrees.\n', countsDeg)
+        case 'a'
+            % Get adc counts
+            adcCounts = fscanf(mySerial, '%d');
+            fprintf('The ADC counts are %d counts.\n', adcCounts)
+        case 'b'
+            % Get adc current sense reading in mA
+            adc_mA= fscanf(mySerial, '%f');
+            fprintf('The ADC current sense reading is %.2f mA\n.', adc_mA)
         case 'q'
             has_quit = true;             % exit client
         otherwise

@@ -138,23 +138,79 @@ Still it allows the sketch to get the idea of what connections are needed across
 \section*{Miscellaneous Notes}
 Step 5:
 
+Choose $R_3 = 220 \Omega$
+
 $V = 6V$ % Four 1.5v batteries in series
-$R_{motor} = 3.0 \Omega$
-$I_{max} = 2V/R_{motor} = 2(6)/(3.0) = 4A$ % Worst case change from -V to +V
-$V_{max} = I_{max} (15 m\Omega) = (4) (15 \times 10^{-3}) = 0.06 V$
+$R_{motor} = 4.6 \Omega$
+$I_{max} = 2V/R_{motor} = 2(6)/(4.6) = 2.61A$ % Worst case change from -V to +V
+$V_{max} = I_{max} (15 m\Omega) = (2.61) (15 \times 10^{-3}) = 0.04 V$
 
-$1.65 = G \times V_{max} = (1+\frac{R_1}{R_2}) (0.06)$
+$1.65 = G \times V_{max} = (1+\frac{R_1}{R_2}) (0.04)$
 
-$G = 27.5$
+$G = 41.25$
 
-$\frac{R_2}{R_1} = 26.5$
+$\frac{R_2}{R_1} = 40.25$
 
-% Choose $R_1 = 265 k\Omega$ and $R_2 = 10 k\Omega$
-Choose $R_2 = 330 k\Omega$ and $R_1 = 10 k\Omega$
+Choose $R_2 = 330 k\Omega$ and $R_1 = 10 k\Omega$.
+Thus $G = 33$
 
 $f_c = \frac{1}{2 \pi RC} \approx 200 Hz$
 
+% Choose $R = 1 M\Omega$ and $C = 1000 pF$.
+% Thus $f_c = 159 Hz$
+Choose $R = 680 \Omega$ and $C = 1 \mu F$.
+Thus $f_c = 234 Hz$
 
-Choose $R = 1 M\Omega$ and $C = 1000 pF$
+
+Calibration (input voltage )
+% \begin{center}
+% \begin{tabular}{|c|c|c|c|}
+%     \hline
+%     Input Voltage & R0 & Expected Current & Measured Current\\
+%     \hline
+%     5V & 10 & 0.5 A & 0.390 A\\
+%     \hline
+%     -5V & 10 & 0.5 A &  -0.370 A\\
+%     \hline
+%     5V & 20 & 0.25 A & 0.205 A \\
+%     \hline
+%     -5V & 20 & -0.25 A & -0.200 A \\
+%     \hline
+%     5V & 40 & 0.125 A & 0.106 A \\
+%     \hline
+%     -5V & 40 & -0.125 A & -0.109 A \\
+%     \hline
+% \end{tabular}
+% \end{center}
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|}
+    \hline
+    Input Voltage & R0 & Expected Current & Measured Current & ADC Counts \\
+    \hline
+    6V & 40 & 150 mA & 130 mA & 568 574 528 \\
+    \hline
+    -6V & 40 & -150 mA & -120 mA & 448 512 528\\
+    \hline
+    6V & 30 & 200 mA & 160 mA & 575 560 512 \\
+    \hline
+    -6V & 30 & -200 mA & -160 mA & 495 415 447 \\
+    \hline
+    6V & 20 & 300 mA & 220 mA & 591 471 576 \\
+    \hline
+    -6V & 20 & -300 mA & -230 mA & 391 464 448 \\
+    \hline
+    6V & 10 & 600 mA & 430 mA & 608 607 623 \\
+    \hline
+    -6V & 10 & -600 mA & -440 mA & 439 415 464 \\
+    \hline
+    0 V & 0 & 0 mA & 0 mA & 503 512 511 \\
+    \hline
+\end{tabular}
+\end{center}
+
+\begin{center}
+    \includegraphics[width=5in]{current_sensor_calibration_curve.png}
+\end{center}
 
 \end{document}
