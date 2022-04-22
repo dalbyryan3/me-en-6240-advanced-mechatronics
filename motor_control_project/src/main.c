@@ -2,6 +2,9 @@
 // include other header files here
 #include <stdio.h>
 #include "encoder.h"
+#include "isense.h"
+#include "currentcontrol.h"                   
+#include "utilities.h"                   
 
 #define BUF_SIZE 200
 
@@ -13,8 +16,10 @@ int main()
   NU32_LED2 = 1;        
   __builtin_disable_interrupts();
   // in future, initialize modules or peripherals here
+  set_operating_mode(IDLE);
   encoder_init();
   adc_init();
+  currentcontrol_init();
   __builtin_enable_interrupts();
 
   while(1)
@@ -89,9 +94,37 @@ int main()
         NU32_WriteUART3(buffer); // send to client 
         break;
       }
+      case 'f': 
+      {
+        double pwm_val;
+        NU32_ReadUART3(buffer,BUF_SIZE);
+        sscanf(buffer, "%f", &pwm_val);
+
+        set_motor_pwm_and_direction_values(pwm_val);
+        set_operating_mode(PWM);
+
+        sprintf(buffer, "PWM direction val is now %.3f and mode is PWM \r\n", pwm_val);
+        NU32_WriteUART3(buffer);
+        break;
+      }
+      case 'p': 
+      {
+        set_operating_mode(IDLE);
+
+        NU32_WriteUART3("Mode is IDLE \r\n");
+        break;
+      }
+      case 'r': 
+      {
+        // Get operating mode
+        sprintf(buffer, "%s\r\n", get_operating_mode_str());
+        NU32_WriteUART3(buffer); // send to client
+        break;
+      }
       case 'q':
       {
-        // handle q for quit. Later you may want to return to IDLE mode here. 
+        // handle q for quit. Return to IDLE mode. 
+        set_operating_mode(IDLE);
         break;
       }
       default:
