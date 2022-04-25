@@ -12,7 +12,7 @@ static int encoder_command(int read) { // send a command to the encoder chip
   SPI4BUF;                             // garbage was transferred, ignore it
   SPI4BUF = 5;                         // write garbage, but the read will have the data
   while (!SPI4STATbits.SPIRBF) { ; }
-  // SPI4BUF; // Why is this needed? Do realize sometimes it takes two encoder_counts() calls to get new enocder value...
+  SPI4BUF; // Why is this needed? Do realize sometimes it takes two encoder_counts() calls to get new enocder value...
   return SPI4BUF;
 }
 
@@ -26,7 +26,7 @@ void encoder_reset_counts(void) {
 }
 
 double encoder_counts_deg(void){
-  double shifted_counts = 32768 - encoder_counts();
+  double shifted_counts = encoder_counts() - 32768;
   return 360.0 * (shifted_counts)/((double)ENCODER_COUNTS_PER_REV);
 }
 

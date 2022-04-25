@@ -102,22 +102,41 @@ int main()
 
         set_motor_pwm_and_direction_values(pwm_val);
         set_operating_mode(PWM);
-
-        sprintf(buffer, "PWM direction val is now %.3f and mode is PWM \r\n", pwm_val);
-        NU32_WriteUART3(buffer);
+        // sprintf(buffer, "PWM direction val is now %.3f and mode is PWM \r\n", pwm_val);
+        // NU32_WriteUART3(buffer);
         break;
       }
       case 'p': 
       {
         set_operating_mode(IDLE);
-
-        NU32_WriteUART3("Mode is IDLE \r\n");
         break;
       }
       case 'r': 
       {
         // Get operating mode
         sprintf(buffer, "%s\r\n", get_operating_mode_str());
+        NU32_WriteUART3(buffer); // send to client
+        break;
+      }
+      case 'g': 
+      {
+        // Set current gains
+        double PGain = 0;
+        NU32_ReadUART3(buffer,BUF_SIZE);
+        sscanf(buffer, "%f", &PGain);
+        set_current_proportional_gain(PGain);
+
+        double IGain = 0;
+        NU32_ReadUART3(buffer,BUF_SIZE);
+        sscanf(buffer, "%f", &IGain);
+        set_current_integral_gain(IGain);
+
+        break;
+      }
+      case 'h': 
+      {
+        // Get current gains
+        sprintf(buffer, "%f %f\r\n", get_current_proportional_gain(), get_current_integral_gain());
         NU32_WriteUART3(buffer); // send to client
         break;
       }

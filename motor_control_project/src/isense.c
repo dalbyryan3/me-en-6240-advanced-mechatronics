@@ -30,7 +30,7 @@ double adc_current_sense_value_mA(void)
   // double currentSenseA = vSense / (R_SENSE_OHMS);
   // double currentSensemA = currentSenseA*1000;
 
-  double currentSensemA = 3.2894*adc_counts() - 1681.62;
+  double currentSensemA = 6.218*adc_counts() - 3163.65;
 
   return currentSensemA;
 }

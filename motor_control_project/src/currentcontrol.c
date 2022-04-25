@@ -3,8 +3,14 @@
 #include "NU32.h"
 #include <math.h>
 
+#define ITEST_I_REF_MAG_mA 200 
+
 static int PWMDutyCycleOCxRSValue = 0;
 static unsigned char PWMDutyCycleDirection = 0x0;
+static int ITESTCount = 0;
+static int ITESTIRefmA = ITEST_I_REF_MAG_mA;
+static double proportionalGain = 0;
+static double integralGain = 0;
 
 void __ISR(_TIMER_5_VECTOR, IPL5SOFT) Timer5ISR(void) { // INT step: the ISR
   switch (get_operating_mode())
@@ -20,6 +26,24 @@ void __ISR(_TIMER_5_VECTOR, IPL5SOFT) Timer5ISR(void) { // INT step: the ISR
       LATDbits.LATD1 = PWMDutyCycleDirection;
       break;
     case ITEST:
+      // PI current control test to track two full cycles of a +/- 200mA 100Hz square wave reference
+      
+      if (ITESTCount == 99) // Are done with the test
+      {
+        set_operating_mode(IDLE);
+        break;
+      }
+
+      if (ITESTIRefmA == 0) // Test begins
+      {
+        ITESTIRefmA = ITEST_I_REF_MAG_mA;
+      }
+      else if (ITESTIRefmA == 25 || ITESTIRefmA==50 || ITESTIRefmA==75) // Reference changes sign 
+      {
+        ITESTIRefmA *= 1;
+      }
+
+      ITESTIRefmA++;
       break;
     case HOLD:
       break;
@@ -84,4 +108,22 @@ void currentcontrol_init(void)
   T2CONbits.ON = 1; // turn on Timer2
   OC1CONbits.ON = 1; // turn on OC1
 
+}
+
+void set_current_proportional_gain(double currentProportionalGain)
+{
+  proportionalGain = currentProportionalGain;
+}
+double get_current_proportional_gain(void)
+{
+  return proportionalGain;
+}
+
+void set_current_integral_gain(double currentIntegralGain)
+{
+  integralGain = currentIntegralGain;
+}
+double get_current_integral_gain(void)
+{
+  return integralGain;
 }

@@ -36,7 +36,8 @@ while ~has_quit
     % display the menu options; this list will grow
     % fprintf('     d: Dummy Command    q: Quit\n     x: Add Two Numbers Command');
     fprintf(['     q: Quit     x: Add Two Numbers Command\n     c: Read Encoder (counts)     d: Read Encoder (deg)     e: Reset Encoder\n' ...
-        '     a: Read ADC (counts)     b: Read ADC Current Sense Value (mA)']);
+        '     a: Read ADC (counts)     b: Read ADC Current Sense Value (mA)     f: Set Signed PWM\n' ...
+        '     p: Set mode to IDLE     r: Get current mode']);
     % read the user's choice
     selection = input('\nENTER COMMAND: ', 's');
      
@@ -61,10 +62,11 @@ while ~has_quit
         case 'c'
             % Get encoder counts
             counts = fscanf(mySerial, '%d');
+            disp(counts)
             fprintf('The motor angle is %d counts.\n', counts)
         case 'e'
             % Reset encoder count to 32768
-            fprintf('The encoder counts have been reset to the default value of 32768\n')
+            fprintf('The encoder counts have been reset to the default value of 32768.\n')
         case 'd'
             % Get encoder counts converted to degrees
             countsDeg = fscanf(mySerial, '%f');
@@ -75,12 +77,25 @@ while ~has_quit
             fprintf('The ADC counts are %d counts.\n', adcCounts)
         case 'b'
             % Get adc current sense reading in mA
-            adc_mA= fscanf(mySerial, '%f');
+            adc_mA = fscanf(mySerial, '%f');
             fprintf('The ADC current sense reading is %.2f mA\n.', adc_mA)
+        case 'f'
+            % Set motor PWM and direction value and set mode to PWM
+            pwm_val = input('Enter signed motor PWM value (-100% to 100%):');
+            fprintf(mySerial, '%f\n', pwm_val);
+        case 'p'
+            % Set operating mode to IDLE
+            fprintf('Operating mode was set to IDLE.\n');
+        case 'r'
+            % Get operating mode
+            mode = fscanf(mySerial, '%s');
+            fprintf('The operating mode is %s.\n', mode);
         case 'q'
             has_quit = true;             % exit client
         otherwise
             fprintf('Invalid Selection %c\n', selection);
+        % TODO: Diagnose incoming data formatting issues, encoder and adc
+        % readings can be delayed/misformatted, need to handle this
     end
 end
 
