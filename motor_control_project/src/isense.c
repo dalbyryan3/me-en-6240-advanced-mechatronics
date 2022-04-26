@@ -1,5 +1,5 @@
 #include "isense.h"                   
-#include <xc.h>
+#include "NU32.h"
 
 #define VOLTS_PER_COUNT (3.3/1024)
 // #define SAMPLE_TIME_CORE_TIMER_TICKS 100 // 100 core timer ticks corresponds to 2500 ns

@@ -1,5 +1,5 @@
 #include "utilities.h"                   
-#include <xc.h>
+#include "NU32.h"
 
 OperatingMode_t operatingMode = IDLE;
 

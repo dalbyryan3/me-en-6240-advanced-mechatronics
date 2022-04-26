@@ -1,5 +1,5 @@
 #include "encoder.h"                   
-#include <xc.h>
+#include "NU32.h"
 
 // The motor being used has 48 counts per revolution
 #define ENCODER_COUNTS_PER_REV 48

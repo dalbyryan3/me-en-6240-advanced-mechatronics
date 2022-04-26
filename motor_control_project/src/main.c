@@ -4,6 +4,7 @@
 #include "encoder.h"
 #include "isense.h"
 #include "currentcontrol.h"                   
+#include "positioncontrol.h"                   
 #include "utilities.h"                   
 
 #define BUF_SIZE 200
@@ -20,6 +21,7 @@ int main()
   encoder_init();
   adc_init();
   currentcontrol_init();
+  positioncontrol_init();
   __builtin_enable_interrupts();
 
   while(1)
@@ -98,7 +100,7 @@ int main()
       }
       case 'g': 
       {
-        // Set current gains
+        // Set current PI gains
         double PGain = 0;
         NU32_ReadUART3(buffer,BUF_SIZE);
         sscanf(buffer, "%f", &PGain);
@@ -113,7 +115,7 @@ int main()
       }
       case 'h': 
       {
-        // Get current gains
+        // Get current PI gains
         sprintf(buffer, "%f\r\n", get_current_proportional_gain());
         NU32_WriteUART3(buffer); // send to client
         sprintf(buffer, "%f\r\n", get_current_integral_gain());
@@ -127,17 +129,58 @@ int main()
         // Wait for test to complete
         while (get_operating_mode() != IDLE) { ; }
         // Send results to user
-        int len = get_ITESTIArrayLength();
+        int len = get_current_ITESTIArrayLength();
         sprintf(buffer, "%d\r\n", len);
         NU32_WriteUART3(buffer); // send to client
-        double *actual = get_ITESTIActualArray();
-        double *reference = get_ITESTIReferenceArray();
+        double *actual = get_current_ITESTIActualArray();
+        double *reference = get_current_ITESTIReferenceArray();
         int i;
         for (i=0; i < len; i++)
         {
           sprintf(buffer, "%f %f\r\n", reference[i], actual[i]);
           NU32_WriteUART3(buffer); // send to client
         }
+        break;
+      }
+      case 'i': 
+      {
+        // Set position PID gains
+        double PGain = 0;
+        NU32_ReadUART3(buffer,BUF_SIZE);
+        sscanf(buffer, "%f", &PGain);
+        set_position_proportional_gain(PGain);
+
+        double IGain = 0;
+        NU32_ReadUART3(buffer,BUF_SIZE);
+        sscanf(buffer, "%f", &IGain);
+        set_position_integral_gain(IGain);
+
+        double DGain = 0;
+        NU32_ReadUART3(buffer,BUF_SIZE);
+        sscanf(buffer, "%f", &DGain);
+        set_position_derivative_gain(DGain);
+
+        break;
+      }
+      case 'j': 
+      {
+        // Get position PID gains
+        sprintf(buffer, "%f\r\n", get_position_proportional_gain());
+        NU32_WriteUART3(buffer); // send to client
+        sprintf(buffer, "%f\r\n", get_position_integral_gain());
+        NU32_WriteUART3(buffer); // send to client
+        sprintf(buffer, "%f\r\n", get_position_derivative_gain());
+        NU32_WriteUART3(buffer); // send to client
+        break;
+      }
+      case 'l':
+      {
+        // Go to angle (deg)
+        double holdRef = 0;
+        NU32_ReadUART3(buffer,BUF_SIZE);
+        sscanf(buffer, "%f", &holdRef);
+        set_position_HOLDReferencePositionDeg(holdRef);
+        set_operating_mode(HOLD);
         break;
       }
       case 'q':
