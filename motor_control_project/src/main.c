@@ -27,16 +27,6 @@ int main()
     NU32_ReadUART3(buffer,BUF_SIZE); // we expect the next character to be a menu command
     NU32_LED2 = 1;                   // clear the error LED
     switch (buffer[0]) {
-      // case 'd':                      
-      // {
-      //   // dummy command for demonstration purposes
-      //   int n = 0;
-      //   NU32_ReadUART3(buffer,BUF_SIZE);
-      //   sscanf(buffer, "%d", &n);
-      //   sprintf(buffer,"%d\r\n", n + 1); // return the number + 1
-      //   NU32_WriteUART3(buffer);
-      //   break;
-      // }
       case 'x':
       {
         // Add two numbers and give result
@@ -48,7 +38,7 @@ int main()
         sscanf(buffer, "%d", &n2);
         res = n1+n2;
         sprintf(buffer, "%d\r\n", res);
-        NU32_WriteUART3(buffer);
+        NU32_WriteUART3(buffer); // send to client
         break;
       }
       case 'c': 
@@ -76,15 +66,6 @@ int main()
         // Get ADC counts
         sprintf(buffer, "%d\r\n", adc_counts());
         NU32_WriteUART3(buffer); // send to client 
-
-        // sprintf(buffer, "%f\r\n", adc_voltage());
-        // NU32_WriteUART3(buffer); // send to client 
-
-        // sprintf(buffer, "%f\r\n", adc_current_sense_value_mA());
-        // NU32_WriteUART3(buffer); // send to client 
-
-        // Get averaged ADC counts
-        // NU32_WriteUART3("\r\n");
         break;
       }
       case 'b': 
@@ -99,11 +80,8 @@ int main()
         double pwm_val;
         NU32_ReadUART3(buffer,BUF_SIZE);
         sscanf(buffer, "%f", &pwm_val);
-
         set_motor_pwm_and_direction_values(pwm_val);
         set_operating_mode(PWM);
-        // sprintf(buffer, "PWM direction val is now %.3f and mode is PWM \r\n", pwm_val);
-        // NU32_WriteUART3(buffer);
         break;
       }
       case 'p': 
@@ -136,8 +114,30 @@ int main()
       case 'h': 
       {
         // Get current gains
-        sprintf(buffer, "%f %f\r\n", get_current_proportional_gain(), get_current_integral_gain());
+        sprintf(buffer, "%f\r\n", get_current_proportional_gain());
         NU32_WriteUART3(buffer); // send to client
+        sprintf(buffer, "%f\r\n", get_current_integral_gain());
+        NU32_WriteUART3(buffer); // send to client
+        break;
+      }
+      case 'k':
+      {
+        // Test current gains
+        set_operating_mode(ITEST);
+        // Wait for test to complete
+        while (get_operating_mode() != IDLE) { ; }
+        // Send results to user
+        int len = get_ITESTIArrayLength();
+        sprintf(buffer, "%d\r\n", len);
+        NU32_WriteUART3(buffer); // send to client
+        double *actual = get_ITESTIActualArray();
+        double *reference = get_ITESTIReferenceArray();
+        int i;
+        for (i=0; i < len; i++)
+        {
+          sprintf(buffer, "%f %f\r\n", reference[i], actual[i]);
+          NU32_WriteUART3(buffer); // send to client
+        }
         break;
       }
       case 'q':

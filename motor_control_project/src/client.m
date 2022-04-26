@@ -37,7 +37,8 @@ while ~has_quit
     % fprintf('     d: Dummy Command    q: Quit\n     x: Add Two Numbers Command');
     fprintf(['     q: Quit     x: Add Two Numbers Command\n     c: Read Encoder (counts)     d: Read Encoder (deg)     e: Reset Encoder\n' ...
         '     a: Read ADC (counts)     b: Read ADC Current Sense Value (mA)     f: Set Signed PWM\n' ...
-        '     p: Set mode to IDLE     r: Get current mode']);
+        '     p: Set mode to IDLE     r: Get current mode\n' ...
+        '     g: Set current control gains     h: Get current control gains     k: Test current gains\n']);
     % read the user's choice
     selection = input('\nENTER COMMAND: ', 's');
      
@@ -62,7 +63,6 @@ while ~has_quit
         case 'c'
             % Get encoder counts
             counts = fscanf(mySerial, '%d');
-            disp(counts)
             fprintf('The motor angle is %d counts.\n', counts)
         case 'e'
             % Reset encoder count to 32768
@@ -90,12 +90,25 @@ while ~has_quit
             % Get operating mode
             mode = fscanf(mySerial, '%s');
             fprintf('The operating mode is %s.\n', mode);
+        case 'g'
+            % Set current gains
+            prop_gain = input('Enter current control proportional gain: ');
+            fprintf(mySerial, '%f\n', prop_gain);
+            int_gain = input('Enter current control integral gain: ');
+            fprintf(mySerial, '%f\n', int_gain);
+        case 'h'
+            % Get current gains
+            prop_gain = fscanf(mySerial, '%f');
+            int_gain = fscanf(mySerial, '%f');
+            fprintf('Proportional gain: %.3f\nIntegral gain: %.3f\n', prop_gain, int_gain);
+        case 'k'
+            % Test current gains
+            fprintf('Running current gain test\n');
+            read_plot_matrix(mySerial);
         case 'q'
             has_quit = true;             % exit client
         otherwise
             fprintf('Invalid Selection %c\n', selection);
-        % TODO: Diagnose incoming data formatting issues, encoder and adc
-        % readings can be delayed/misformatted, need to handle this
     end
 end
 

@@ -1,16 +1,25 @@
 #include "currentcontrol.h"                   
+#include "isense.h"                   
 #include "utilities.h"
 #include "NU32.h"
 #include <math.h>
 
-#define ITEST_I_REF_MAG_mA 200 
+#define ITEST_I_REFERENCE_MAG_mA 200 
+#define ITEST_ARRAY_LENGTH 100
+#define ITEST_SAMPLE_PERIOD (1.0/5000)
 
 static int PWMDutyCycleOCxRSValue = 0;
 static unsigned char PWMDutyCycleDirection = 0x0;
+
+static double proportionalGain = 0; // %/mA
+static double integralGain = 0; // %/(mA*seconds)
+static double lastError = 0; // mA
+static double integralError = 0; // mA*seconds
+
 static int ITESTCount = 0;
-static int ITESTIRefmA = ITEST_I_REF_MAG_mA;
-static double proportionalGain = 0;
-static double integralGain = 0;
+static double ITESTIReferencemA = ITEST_I_REFERENCE_MAG_mA;
+static double ITESTIActualArray[ITEST_ARRAY_LENGTH];
+static double ITESTIReferenceArray[ITEST_ARRAY_LENGTH];
 
 void __ISR(_TIMER_5_VECTOR, IPL5SOFT) Timer5ISR(void) { // INT step: the ISR
   switch (get_operating_mode())
@@ -22,28 +31,42 @@ void __ISR(_TIMER_5_VECTOR, IPL5SOFT) Timer5ISR(void) { // INT step: the ISR
       break;
     case PWM:
       // Set duty cyle to present PWM value
-      OC1RS = PWMDutyCycleOCxRSValue;
-      LATDbits.LATD1 = PWMDutyCycleDirection;
+      command_motor_pwm_and_direction();
       break;
     case ITEST:
       // PI current control test to track two full cycles of a +/- 200mA 100Hz square wave reference
-      
-      if (ITESTCount == 99) // Are done with the test
+      if (ITESTCount == 0) // Test begins
+      {
+        ITESTIReferencemA = ITEST_I_REFERENCE_MAG_mA;
+      }
+      else if (ITESTCount == 24 || ITESTCount==49 || ITESTCount==74) // Reference changes sign 
+      {
+        ITESTIReferencemA *= -1;
+      }
+
+      // Get measured current and update arrays for subsequent data processing/viz
+      double measuredCurrentmA = adc_current_sense_value_mA();
+      ITESTIReferenceArray[ITESTCount] = ITESTIReferencemA;
+      ITESTIActualArray[ITESTCount] = measuredCurrentmA;
+
+      // PI Control
+      double errmA = ITESTIReferencemA - measuredCurrentmA; // units of mA
+      integralError += errmA * ITEST_SAMPLE_PERIOD; // units of mA*seconds
+      double uEff = (errmA * proportionalGain) + (integralError * integralGain); // Control effort, proportionalGain in units of %/mA and integralGain in units of %/(mA*seconds), note % implies % duty cycle
+      // lastError = errmA; 
+
+      // Apply control effort
+      set_motor_pwm_and_direction_values(uEff);
+      command_motor_pwm_and_direction();
+
+      // Update count and see if done
+      ITESTCount++;
+      if (ITESTCount == 100) // Are done with the test
       {
         set_operating_mode(IDLE);
+        ITESTCount = 0;
         break;
       }
-
-      if (ITESTIRefmA == 0) // Test begins
-      {
-        ITESTIRefmA = ITEST_I_REF_MAG_mA;
-      }
-      else if (ITESTIRefmA == 25 || ITESTIRefmA==50 || ITESTIRefmA==75) // Reference changes sign 
-      {
-        ITESTIRefmA *= 1;
-      }
-
-      ITESTIRefmA++;
       break;
     case HOLD:
       break;
@@ -79,6 +102,12 @@ void set_motor_pwm_and_direction_values(double signed_duty_cycle)
     PWMDutyCycleOCxRSValue = (int) ((signed_duty_cycle/100) * (PR2+1));
     PWMDutyCycleDirection = 0x1;
   }
+}
+
+void command_motor_pwm_and_direction(void)
+{
+  OC1RS = PWMDutyCycleOCxRSValue;
+  LATDbits.LATD1 = PWMDutyCycleDirection;
 }
 
 void currentcontrol_init(void)
@@ -127,3 +156,19 @@ double get_current_integral_gain(void)
 {
   return integralGain;
 }
+
+double* get_ITESTIActualArray(void)
+{
+  return ITESTIActualArray;
+}
+
+double* get_ITESTIReferenceArray(void)
+{
+  return ITESTIReferenceArray;
+}
+
+int get_ITESTIArrayLength(void)
+{
+  return ITEST_ARRAY_LENGTH;
+}
+

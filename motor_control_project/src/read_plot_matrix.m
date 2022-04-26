@@ -14,7 +14,7 @@ function data = read_plot_matrix(mySerial)
   % compute the average error
   score = mean(abs(data(:,1)-data(:,2)));
   fprintf('\nAverage error: %5.1f mA\n',score);
-  title(sprintf('Average error: %5.1f mA',score));
+  title(sprintf('ITEST Plot\nAverage error: %5.1f mA',score));
   ylabel('Current (mA)');
   xlabel('Time (ms)');  
 end
