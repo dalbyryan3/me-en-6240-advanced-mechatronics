@@ -18,9 +18,9 @@ static double integralGain = 5; // %/(mA*seconds)
 static double integralError = 0; // mA*seconds
 
 static int ITESTCount = 0;
-static double ITESTIReferencemA = ITEST_I_REFERENCE_MAG_mA;
-static double ITESTIActualArray[ITEST_ARRAY_LENGTH];
-static double ITESTIReferenceArray[ITEST_ARRAY_LENGTH];
+static double ITESTIReferencemA = ITEST_I_REFERENCE_MAG_mA; // mA
+static double ITESTIActualArray[ITEST_ARRAY_LENGTH]; // mA
+static double ITESTIReferenceArray[ITEST_ARRAY_LENGTH]; // mA
 
 static double HOLDIReferencemA = 0;
 
@@ -29,9 +29,11 @@ void __ISR(_TIMER_5_VECTOR, IPL5SOFT) Timer5ISR(void) { // INT step: the ISR
   {
     case IDLE:
     {
+      // Make sure if we exited from another mode that we have clean state
+      current_clean_state_IDLE();
       // H-bridge brake mode
       OC1RS = 0;
-      LATDbits.LATD1 = PWMDutyCycleDirection ^ 0x1; // Do opposite of present value for brake?
+      // LATDbits.LATD1 = PWMDutyCycleDirection ^ 0x1; // Do opposite of present value for brake?
       break;
     }
     case PWM:
@@ -42,6 +44,10 @@ void __ISR(_TIMER_5_VECTOR, IPL5SOFT) Timer5ISR(void) { // INT step: the ISR
     }
     case ITEST:
     {
+      if (ITESTCount > 100) // We have gotten over 100 so we want to reset
+      {
+        ITESTCount = 0;
+      }
       // PI current control test to track two full cycles of a +/- 200mA 100Hz square wave reference
       if (ITESTCount == 0) // Test begins
       {
@@ -65,24 +71,22 @@ void __ISR(_TIMER_5_VECTOR, IPL5SOFT) Timer5ISR(void) { // INT step: the ISR
       ITESTCount++;
       if (ITESTCount == 100) // Are done with the test
       {
-        set_operating_mode(IDLE);
         ITESTCount = 0;
+        set_operating_mode(IDLE);
         break;
       }
       break;
     }
     case HOLD:
+    case TRACK:
     {
-      // PI control
+      // PI control (same as HOLD case from current control perspective)
       double measuredCurrentmA = adc_current_sense_value_mA();
       current_PI_control(HOLDIReferencemA, measuredCurrentmA);
       break;
     }
-    case TRACK:
-    {
-      break;
-    }
   }
+
   IFS0bits.T5IF = 0; // clear interrupt flag
 }
 
@@ -125,6 +129,7 @@ void currentcontrol_init(void)
   T2CONbits.ON = 1; // turn on Timer2
   OC1CONbits.ON = 1; // turn on OC1
 }
+
 
 void set_motor_pwm_and_direction_values(double signed_duty_cycle)
 {
@@ -195,3 +200,9 @@ void set_current_HOLDIReferencemA(double currentHOLDIReferencemA)
   HOLDIReferencemA = currentHOLDIReferencemA;
 }
 
+void current_clean_state_IDLE(void)
+{
+  ITESTCount = 0;
+  ITESTIReferencemA = ITEST_I_REFERENCE_MAG_mA; // mA
+  integralError = 0;
+}

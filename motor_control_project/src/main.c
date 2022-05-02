@@ -124,10 +124,11 @@ int main()
       }
       case 'k':
       {
+        set_operating_mode(IDLE);
         // Test current gains
         set_operating_mode(ITEST);
         // Wait for test to complete
-        while (get_operating_mode() != IDLE) { ; }
+        while (get_operating_mode() == ITEST) { ; }
         // Send results to user
         int len = get_current_ITESTIArrayLength();
         sprintf(buffer, "%d\r\n", len);
@@ -176,11 +177,58 @@ int main()
       case 'l':
       {
         // Go to angle (deg)
+        set_operating_mode(IDLE);
         double holdRef = 0;
         NU32_ReadUART3(buffer,BUF_SIZE);
         sscanf(buffer, "%f", &holdRef);
         set_position_HOLDReferencePositionDeg(holdRef);
         set_operating_mode(HOLD);
+        break;
+      }
+      case 'm':
+      case 'n':
+      {
+        // Load trajectory (can be a step ('m') or cubic ('n') trajectory)
+        int numTrajectorySamples = 0;
+        NU32_ReadUART3(buffer,BUF_SIZE);
+        sscanf(buffer, "%d", &numTrajectorySamples);
+        if (numTrajectorySamples > get_position_TRACKArrayMaxLength())
+        {
+          NU32_WriteUART3("TRAJECTORY NOT LOADED: TOO MANY SAMPLES FOR PIC32 DATA ARRAY\r\n"); // send to client
+          break;
+        }
+
+        set_position_TRACKArrayLength(numTrajectorySamples);
+
+        double *arr = get_position_TRACKReferenceArray();
+        int i;
+        for (i=0; i < numTrajectorySamples; i++)
+        {
+          NU32_ReadUART3(buffer,BUF_SIZE);
+          sscanf(buffer, "%f", &(arr[i]));
+        }
+        NU32_WriteUART3("TRAJECTORY LOADED\r\n"); // send to client
+        break;
+      }
+      case 'o':
+      {
+        set_operating_mode(IDLE);
+        // Execute trajectory
+        set_operating_mode(TRACK);
+        // Wait for trajectory tracking to complete
+        while (get_operating_mode() == TRACK) { ; }
+        // Send results to user
+        int len = get_position_TRACKArrayLength();
+        sprintf(buffer, "%d\r\n", len);
+        NU32_WriteUART3(buffer); // send to client
+        double *actual = get_position_TRACKActualArray();
+        double *reference = get_position_TRACKReferenceArray();
+        int i;
+        for (i=0; i < len; i++)
+        {
+          sprintf(buffer, "%f %f\r\n", reference[i], actual[i]);
+          NU32_WriteUART3(buffer); // send to client
+        }
         break;
       }
       case 'q':

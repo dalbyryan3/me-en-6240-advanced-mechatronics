@@ -38,7 +38,9 @@ while ~has_quit
     fprintf(['     q: Quit     x: Add Two Numbers Command\n     c: Read Encoder (counts)     d: Read Encoder (deg)     e: Reset Encoder\n' ...
         '     a: Read ADC (counts)     b: Read ADC Current Sense Value (mA)     f: Set Signed PWM\n' ...
         '     p: Set mode to IDLE     r: Get current mode\n' ...
-        '     g: Set current control gains     h: Get current control gains     k: Test current gains\n']);
+        '     g: Set current control gains     h: Get current control gains     k: Test current gains\n' ...
+        '     i: Set position gains     j: Get position gains     l: Go to angle (deg)\n' ...
+        '     m: Load step trajectory     n: Load cubic trajectory     o: Execute trajectory']);
     % read the user's choice
     selection = input('\nENTER COMMAND: ', 's');
      
@@ -104,7 +106,49 @@ while ~has_quit
         case 'k'
             % Test current gains
             fprintf('Running current gain test\n');
-            read_plot_matrix(mySerial);
+            read_plot_matrix_ITEST(mySerial);
+        case 'i'
+            % Set position gains
+            prop_gain = input('Enter position control proportional gain: ');
+            fprintf(mySerial, '%f\n', prop_gain);
+            int_gain = input('Enter position control integral gain: ');
+            fprintf(mySerial, '%f\n', int_gain);
+            deriv_gain = input('Enter position control derivative gain: ');
+            fprintf(mySerial, '%f\n', deriv_gain);
+        case 'j'
+            % Get position gains
+            prop_gain = fscanf(mySerial, '%f');
+            int_gain = fscanf(mySerial, '%f');
+            deriv_gain = fscanf(mySerial, '%f');
+            fprintf('Proportional gain: %.3f\nIntegral gain: %.3f\nDerivative gain: %.3f\n', prop_gain, int_gain, deriv_gain);
+        case 'l'
+            % Command position to a desired angle
+            ref_deg = input('Enter desired angle (in degrees) to command to: ');
+            fprintf(mySerial, '%f\n', ref_deg);
+        case 'm'
+            % Load step trajectory
+            traj_params = input('Enter step trajectory parameters: ');
+            sig = genRef(traj_params,'step');
+            fprintf(mySerial, '%d\n', length(sig));
+            for s = sig
+                fprintf(mySerial, '%f\n', s);
+            end
+            result = fscanf(mySerial, '%s');
+            fprintf('%s\n', result);
+        case 'n'
+            % Load cubic trajectory
+            traj_params = input('Enter cubic trajectory parameters: ');
+            sig = genRef(traj_params,'cubic');
+            fprintf(mySerial, '%d\n', length(sig));
+            for s = sig
+                fprintf(mySerial, '%f\n', s);
+            end
+            result = fscanf(mySerial, '%s');
+            fprintf('%s\n', result);
+        case 'o'
+            % Execute loaded trajectory
+            fprintf('Executing loaded trajectory\n');
+            read_plot_matrix_TRACK(mySerial);
         case 'q'
             has_quit = true;             % exit client
         otherwise

@@ -24,4 +24,6 @@ int get_current_ITESTIArrayLength(void);
 
 void set_current_HOLDIReferencemA(double currentHOLDIReferencemA);
 
+void current_clean_state_IDLE(void);
+
 #endif // CURRENTCONTROL_H
