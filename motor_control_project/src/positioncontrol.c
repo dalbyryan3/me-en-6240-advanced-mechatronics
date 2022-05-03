@@ -47,8 +47,8 @@ void __ISR(_TIMER_4_VECTOR, IPL5SOFT) Timer4ISR(void) { // INT step: the ISR
       TRACKCount++;
       if (TRACKCount == get_position_TRACKArrayLength()) // Are done with tracking trajectory 
       {
-        set_operating_mode(HOLD);
         HOLDReferencePositionDeg = TRACKReferenceArray[(TRACKCount-1)];
+        set_operating_mode(HOLD);
         TRACKCount = 0;
         break;
       }
@@ -67,7 +67,7 @@ void positioncontrol_init(void)
   TMR4 = 0; // initial TMR4 count is 0
   T4CONbits.ON = 1; // turn on Timer4
   IPC4bits.T4IP = 5; // INT step: priority
-  IPC4bits.T4IS = 1; // subpriority
+  IPC4bits.T4IS = 0; // subpriority
   IFS0bits.T4IF = 0; // INT step: clear interrupt flag
   IEC0bits.T4IE = 1; // INT step: enable interrupt
 }

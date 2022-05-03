@@ -6,6 +6,7 @@
 \usepackage{graphicx}
 \usepackage{listings}
 \usepackage{gensymb}
+\usepackage{hyperref}
 
 \graphicspath{{./images/}}
 
@@ -54,23 +55,18 @@
 On the NU32 SPI2 is unavailable because RG6 and RG7 are used for UART communication with with host computer.
 Thus SPI3 and SPI4 can be used on the NU32 but I will choose SPI4 as it seems to overlap with less lower number digital IO pins than SPI3 which would generally be the first used for other things.
 
-This means I will use NU32 pins (PIC32 in parenthesis) B14(29) for SCK4, F4(31) for SDI4, and F5(32) for SDO4.
-
-% Note in examples B8 (21) is often used for SS4
-
+This means I will use NU32 pins (PIC32 in parenthesis) B14(29) for SCK4, F4(31) for SDI4, and F5(32) for SDO4. 
+I will also use B8 (21) for SS4.
 
 \section*{2.}
 \textit{The NU32 reads the MAX9918 current sensor using an ADC input. Which ADC input will you use? Which NU32 pin is it?}
 
 I will choose to use AN5 which corresponds to B5 on the NU32 (pin 11 on the PIC32) as an analog input to the PIC32 for the MAX9918 current sensor.
-
 % AN5 was often used for ADC examples and problems during this class.
 
 \section*{3.}
 \textit{The NU32 controls the DRV8835 H-bridge using a direction bit (a digital output) and PWM (an output compare and a timer). Which peripherals will you use, and which NU32 pins?}
 
-% For the direction bit I will use digital output configured RB7 which corresponds to B7 on the NU32 (pin 18 on the PIC32). 
-% This can be changed if there are conflicts or another unused digital pin makes wiring easier, but this one was chosen since it has limited possible conflicts.
 For the direction bit I will use digital output configured RD1 which corresponds to D1 on the NU32 (pin 49 on the PIC32). 
 This was chosen because of its close physical proximity on the NU32 to the chosen output compare.
 
@@ -86,8 +82,7 @@ I will use timer4 for the 200 Hz position control ISR and timer5 for the 5 kHz c
 If a 32-bit timer for a loop is needed I can use timer45 and then use timer1 for the other loop.
 If two 32-bit timers are needed this won't really be possible because timer23 will be being used for PWM.
 
-I will give both ISRs for position and current control the same priority so neither will interrupt each other once one begins and give a higher subpriority to the position control ISR since it occurs less often and I would like to make sure when it needs to execute it will be ahead of the current control ISR which occurs much more frequently.
-% Prof suggests current control priority above position...
+I will give both ISRs for position and current control the same priority of 5 so neither will interrupt each other once one begins and give a higher subpriority of 1 to the current control ISR since it is the lower level control routine and I will give a subpriority of 0 to the position control ISR. 
 
 \section*{5.}
 \textit{Based on your answers to these questions, and your understanding of the project, annotate the block diagram of Figure 27.7. Each block should clearly indicate which devices or peripherals perform the operation in the block, and each signal line should clearly indicate how the signal is carried from one block to the other. (After this step, there should be no question about the hardware involved in the project. The details of wiring the H-bridge, current sensor, and encoder are left to later.)}
@@ -112,31 +107,56 @@ Still it allows the sketch to get the idea of what connections are needed across
 \section*{8.}
 \textit{Turn in your best ITEST plot, and indicate the control gains you used, as well as their units.}
 
+\begin{center}
+    \includegraphics[width=4in]{ITEST_kp0.5_ki5.png}
+\end{center}
+
+Gains used were $k_p = 0.5 \%/mA$ and $k_i = 5 \%/(mA*second)$ where $\%$ implies percent duty cycle.
+
 \section*{9.}
 \textit{Turn in your best plots of following the step and cubic trajectories in Figure 28.5 with the load attached. Indicate the control gains you used, as well as their units.}
 
+\begin{center}
+    \includegraphics[width=4in]{step_kp14_ki0_kd0.05.png}
+    \includegraphics[width=4in]{cubic_kp14_ki0_kd0.05.png}
+\end{center}
+
+Gains used were $k_p = 14 mA/deg$, $k_i = 0 mA/(deg*second)$, and $k_d = 0.05 mA/(deg/second)$ for both the step and cubic trajectories (shown respectively above).
+
 \section*{10.}
 \textit{Turn in all your code for the motor control project.}
+See \verb|src| folder for all code used for this project.
 
 \section*{11.}
 \textit{Turn in a video demonstration of the motor control project.  The demonstration should include the following:}
 \begin{enumerate}
     \item[1.]
     \textit{Startup the system (initialization etc.)}
+    See \verb|vid1.mov| or \url{https://photos.app.goo.gl/dWrvufFMCC5sgXG69}.
 
     \item[2.]
     \textit{Show the position step response using “good” gains of the controller}
 
+    See \verb|vid2.mov| or \url{https://photos.app.goo.gl/fG8ufLefoDMXY1Ja6}.
+
     \item[3.]
     \textit{Change the PID gains to show a “bad” position step response}
 
+    See \verb|vid3.mov| or \url{https://photos.app.goo.gl/fG8ufLefoDMXY1Ja6}.
+
     \item[4.]
     \textit{Change back to good gains and cubic trajectory tracking}
+
+    See \verb|vid4.mov| or \url{https://photos.app.goo.gl/jeUxLn9DNhqWuf4f6}.
+
 \end{enumerate}
 
 
+\pagebreak
+
 \section*{Miscellaneous Notes}
-Step 5:
+\subsection*{Current Sensor Configuration}
+Resistor selection of an external circuit configures the current sensor.
 
 Choose $R_3 = 220 \Omega$
 
@@ -156,59 +176,11 @@ Thus $G = 33$
 
 $f_c = \frac{1}{2 \pi RC} \approx 200 Hz$
 
-% Choose $R = 1 M\Omega$ and $C = 1000 pF$.
-% Thus $f_c = 159 Hz$
 Choose $R = 680 \Omega$ and $C = 1 \mu F$.
 Thus $f_c = 234 Hz$
 
 
-Calibration (input voltage )
-% \begin{center}
-% \begin{tabular}{|c|c|c|c|}
-%     \hline
-%     Input Voltage & R0 & Expected Current & Measured Current\\
-%     \hline
-%     5V & 10 & 0.5 A & 0.390 A\\
-%     \hline
-%     -5V & 10 & 0.5 A &  -0.370 A\\
-%     \hline
-%     5V & 20 & 0.25 A & 0.205 A \\
-%     \hline
-%     -5V & 20 & -0.25 A & -0.200 A \\
-%     \hline
-%     5V & 40 & 0.125 A & 0.106 A \\
-%     \hline
-%     -5V & 40 & -0.125 A & -0.109 A \\
-%     \hline
-% \end{tabular}
-% \end{center}
-
-% \begin{center}
-% \begin{tabular}{|c|c|c|c|c|}
-%     \hline
-%     Input Voltage & R0 & Expected Current & Measured Current & ADC Counts \\
-%     \hline
-%     6V & 40 & 150 mA & 130 mA & 568 574 528 \\
-%     \hline
-%     -6V & 40 & -150 mA & -120 mA & 448 512 528\\
-%     \hline
-%     6V & 30 & 200 mA & 160 mA & 575 560 512 \\
-%     \hline
-%     -6V & 30 & -200 mA & -160 mA & 495 415 447 \\
-%     \hline
-%     6V & 20 & 300 mA & 220 mA & 591 471 576 \\
-%     \hline
-%     -6V & 20 & -300 mA & -230 mA & 391 464 448 \\
-%     \hline
-%     6V & 10 & 600 mA & 430 mA & 608 607 623 \\
-%     \hline
-%     -6V & 10 & -600 mA & -440 mA & 439 415 464 \\
-%     \hline
-%     0 V & 0 & 0 mA & 0 mA & 503 512 511 \\
-%     \hline
-% \end{tabular}
-% \end{center}
-
+\subsection*{Calibration}
 \begin{center}
 \begin{tabular}{|c|c|c|c|c|}
     \hline

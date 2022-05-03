@@ -17,4 +17,5 @@ function data = read_plot_matrix_ITEST(mySerial)
   title(sprintf('ITEST Plot\nAverage error: %5.1f mA',score));
   ylabel('Current (mA)');
   xlabel('Time (ms)');  
+  legend('Reference', 'Actual');
 end

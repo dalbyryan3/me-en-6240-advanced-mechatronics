@@ -7,6 +7,7 @@
 #define ITEST_I_REFERENCE_MAG_mA 200 
 #define ITEST_ARRAY_LENGTH 100
 #define CURRENT_CONTROL_SAMPLE_PERIOD (1.0/5000)
+#define INTEGRAL_EFFORT_WINDUP_LIMIT 100
 
 static int PWMDutyCycleOCxRSValue = 0;
 static unsigned char PWMDutyCycleDirection = 0x0;
@@ -33,7 +34,7 @@ void __ISR(_TIMER_5_VECTOR, IPL5SOFT) Timer5ISR(void) { // INT step: the ISR
       current_clean_state_IDLE();
       // H-bridge brake mode
       OC1RS = 0;
-      // LATDbits.LATD1 = PWMDutyCycleDirection ^ 0x1; // Do opposite of present value for brake?
+      LATDbits.LATD1 = PWMDutyCycleDirection ^ 0x1; // Do opposite of present value for brake?
       break;
     }
     case PWM:
@@ -95,7 +96,12 @@ void current_PI_control(double referencemA, double measuredmA)
   // PI Control
   double errmA = referencemA - measuredmA; // units of mA
   integralError += errmA * CURRENT_CONTROL_SAMPLE_PERIOD; // units of mA*seconds
-  double uEff = (errmA * proportionalGain) + (integralError * integralGain); // Control effort, proportionalGain in units of %/mA and integralGain in units of %/(mA*seconds), note % implies % duty cycle
+  double integralEff = integralError * integralGain;
+  if (integralEff > INTEGRAL_EFFORT_WINDUP_LIMIT)
+  {
+    integralEff = INTEGRAL_EFFORT_WINDUP_LIMIT;
+  }
+  double uEff = (errmA * proportionalGain) + integralEff; // Control effort, proportionalGain in units of %/mA and integralGain in units of %/(mA*seconds), note % implies % duty cycle
 
   // Apply control effort
   set_motor_pwm_and_direction_values(uEff);
@@ -113,7 +119,7 @@ void currentcontrol_init(void)
   TMR5 = 0; // initial TMR5 count is 0
   T5CONbits.ON = 1; // turn on Timer5
   IPC5bits.T5IP = 5; // INT step: priority
-  IPC5bits.T5IS = 0; // subpriority
+  IPC5bits.T5IS = 1; // subpriority
   IFS0bits.T5IF = 0; // INT step: clear interrupt flag
   IEC0bits.T5IE = 1; // INT step: enable interrupt
 

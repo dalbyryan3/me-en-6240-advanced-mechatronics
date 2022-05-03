@@ -127,7 +127,7 @@ while ~has_quit
             fprintf(mySerial, '%f\n', ref_deg);
         case 'm'
             % Load step trajectory
-            traj_params = input('Enter step trajectory parameters: ');
+            traj_params = input('Enter step trajectory, in sec and degrees [time1, ang1; time2, ang2; ...]: ');
             sig = genRef(traj_params,'step');
             fprintf(mySerial, '%d\n', length(sig));
             for s = sig
@@ -137,7 +137,7 @@ while ~has_quit
             fprintf('%s\n', result);
         case 'n'
             % Load cubic trajectory
-            traj_params = input('Enter cubic trajectory parameters: ');
+            traj_params = input('Enter cubic trajectory, in sec and degrees [time1, ang1; time2, ang2; ...]:');
             sig = genRef(traj_params,'cubic');
             fprintf(mySerial, '%d\n', length(sig));
             for s = sig

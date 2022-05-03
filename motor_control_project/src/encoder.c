@@ -10,15 +10,28 @@ static int encoder_command(int read) { // send a command to the encoder chip
   SPI4BUF = read;                      // send the command
   while (!SPI4STATbits.SPIRBF) { ; }   // wait for the response
   SPI4BUF;                             // garbage was transferred, ignore it
+
   SPI4BUF = 5;                         // write garbage, but the read will have the data
   while (!SPI4STATbits.SPIRBF) { ; }
-  SPI4BUF; // Why is this needed? Do realize sometimes it takes two encoder_counts() calls to get new enocder value...
-  return SPI4BUF;
+  int resp = SPI4BUF; 
+
+  // Do this again, for some reason (likely something happening on the pre-programmed encoder chip) this is necessary
+  SPI4BUF = 5;                         // write garbage, but the read will have the data
+  while (!SPI4STATbits.SPIRBF) { ; }
+  resp = SPI4BUF; 
+  
+  // Clear buffer
+  while (SPI4STATbits.SPIRBF) 
+  { 
+    SPI4BUF;
+  }
+
+  return resp;
 }
 
 int encoder_counts(void) {
-  encoder_command(1);
-  return encoder_command(1);
+  int resp = encoder_command(1);
+  return resp;
 }
 
 void encoder_reset_counts(void) {

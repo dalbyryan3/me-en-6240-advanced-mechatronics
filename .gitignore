@@ -21,6 +21,7 @@ bin/
 *.00
 *.vim
 *.asv
+*.MOV
 
 ###
 ### Latex gitignore:

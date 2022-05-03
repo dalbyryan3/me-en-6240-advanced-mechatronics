@@ -17,4 +17,5 @@ function data = read_plot_matrix_TRACK(mySerial)
   title(sprintf('TRACK Plot\nAverage error: %5.1f deg',score));
   ylabel('Angle (deg)');
   xlabel('Time (ms)');  
+  legend('Reference', 'Actual');
 end
